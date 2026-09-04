@@ -26,12 +26,21 @@ export function GradientText({
   useEffect(() => {
     if (!animated || measuredWidth === 0) return;
     shift.setValue(0);
+    // Ping-pong (there and back) instead of a one-way loop, which snaps
+    // the gradient back to its start position every cycle and looks glitchy.
     const loop = Animated.loop(
-      Animated.timing(shift, {
-        toValue: 1,
-        duration: animationDuration,
-        useNativeDriver: true,
-      })
+      Animated.sequence([
+        Animated.timing(shift, {
+          toValue: 1,
+          duration: animationDuration,
+          useNativeDriver: true,
+        }),
+        Animated.timing(shift, {
+          toValue: 0,
+          duration: animationDuration,
+          useNativeDriver: true,
+        }),
+      ])
     );
     loop.start();
     return () => loop.stop();

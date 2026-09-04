@@ -1,11 +1,16 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SplashBackground } from '../components/SplashBackground';
 import { GradientText } from '../components/GradientText';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import { useScaleFont } from '../theme/responsive';
 
 export function SplashScreen() {
+  const insets = useSafeAreaInsets();
+  const scaleFont = useScaleFont();
+
   return (
     <View style={styles.container}>
       <SplashBackground />
@@ -14,7 +19,7 @@ export function SplashScreen() {
         <GradientText
           colors={colors.wordmarkGradient}
           locations={colors.wordmarkGradientLocations}
-          style={styles.wordmarkText}
+          style={{ ...styles.wordmarkText, fontSize: scaleFont(38) }}
         >
           KAIR
         </GradientText>
@@ -23,7 +28,7 @@ export function SplashScreen() {
           <GradientText
             colors={colors.wordmarkGradient}
             locations={colors.wordmarkGradientLocations}
-            style={styles.wordmarkText}
+            style={{ ...styles.wordmarkText, fontSize: scaleFont(38) }}
           >
             O
           </GradientText>
@@ -36,19 +41,18 @@ export function SplashScreen() {
         <GradientText
           colors={colors.wordmarkGradient}
           locations={colors.wordmarkGradientLocations}
-          style={styles.wordmarkText}
+          style={{ ...styles.wordmarkText, fontSize: scaleFont(38) }}
         >
           S
         </GradientText>
       </View>
 
-      <View style={styles.tagline}>
-        <Text style={styles.taglineLine1}>SHOP BETTER</Text>
+      <View style={[styles.tagline, { bottom: 60 + insets.bottom }]}>
+        <Text style={[styles.taglineLine1, { fontSize: scaleFont(9) }]}>SHOP BETTER</Text>
         <GradientText
           colors={colors.taglineGradient}
           locations={colors.taglineGradientLocations}
-          style={styles.taglineLine2}
-          animated
+          style={{ ...styles.taglineLine2, fontSize: scaleFont(13) }}
         >
           SHOP KAIROS
         </GradientText>

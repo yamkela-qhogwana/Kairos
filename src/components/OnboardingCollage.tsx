@@ -121,6 +121,10 @@ const styles = StyleSheet.create({
   fill: {
     width: '100%',
     height: '100%',
+    // Android's native ImageView defaults to a white background until the
+    // image finishes decoding — this avoids a white/odd-color flash before
+    // the fade-in transition.
+    backgroundColor: colors.bgBottom,
   },
   cell1: {
     flex: 1.15,

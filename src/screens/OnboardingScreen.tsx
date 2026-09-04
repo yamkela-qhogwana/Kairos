@@ -1,12 +1,14 @@
 import React, { useRef, useState } from 'react';
 import {
   Animated,
-  Dimensions,
+  LayoutChangeEvent,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  PixelRatio,
   Pressable,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,35 +20,68 @@ import { PaginationDots } from '../components/PaginationDots';
 import { onboardingSlides, OnboardingSlide } from '../data/onboardingSlides';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import { useScaleFont } from '../theme/responsive';
 
-const { width } = Dimensions.get('window');
 const CARD_HORIZONTAL_PADDING = 26;
-// The FlatList sits inside the card's horizontal padding, so each page is
-// narrower than the full screen width — everything driven by scroll position
-// (paging math, getItemLayout, index-from-offset) must agree on this value.
-const PAGE_WIDTH = width - CARD_HORIZONTAL_PADDING * 2;
+// Tuned to fit the longest slide's copy at the default system font size.
+// Scaled up below by the user's actual font-scale setting so "Larger Text"
+// accessibility users don't get their description clipped.
+const CARD_TEXT_BASE_HEIGHT = 160;
 
 type Props = {
   onDone?: () => void;
 };
 
 const SlideText = React.memo(function SlideText({ item }: { item: OnboardingSlide }) {
+  const { width } = useWindowDimensions();
+  const pageWidth = width - CARD_HORIZONTAL_PADDING * 2;
+  const scaleFont = useScaleFont();
+  const eyebrowStyle = [styles.eyebrow, { fontSize: scaleFont(10) }];
+
   return (
-    <View style={styles.slideText}>
+    <View style={[styles.slideText, { width: pageWidth }]}>
       <View style={styles.eyebrowRow}>
-        <Text style={styles.eyebrowMuted}>SHOP </Text>
-        <Text style={styles.eyebrow}>KAIR</Text>
-        <AccentLetter letter="O" style={styles.eyebrow} />
-        <Text style={styles.eyebrow}>S</Text>
+        <Text style={[styles.eyebrowMuted, { fontSize: scaleFont(10) }]}>SHOP </Text>
+        <Text style={eyebrowStyle}>KAIR</Text>
+        <AccentLetter letter="O" style={{ ...styles.eyebrow, fontSize: scaleFont(10) }} />
+        <Text style={eyebrowStyle}>S</Text>
       </View>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.description}>{item.description}</Text>
+      <Text style={[styles.title, { fontSize: scaleFont(21) }]}>{item.title}</Text>
+      <Text style={[styles.description, { fontSize: scaleFont(12.5) }]}>{item.description}</Text>
     </View>
   );
 });
 
 export function OnboardingScreen({ onDone }: Props) {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  // The FlatList sits inside the card's horizontal padding, so each page is
+  // narrower than the full screen width — everything driven by scroll
+  // position (paging math, getItemLayout, index-from-offset) must agree on
+  // this value. Derived from useWindowDimensions (not Dimensions.get, which
+  // is captured once and goes stale on Android split-screen/foldables).
+  const pageWidth = width - CARD_HORIZONTAL_PADDING * 2;
+  const scaleFont = useScaleFont();
+  // Real measured height of the tallest slide's text, so the fixed-height
+  // pager only reserves as much space as the longest slide actually needs
+  // (a hardcoded guess left visible dead space under shorter slides' copy).
+  // Starts at a safe fallback estimate to avoid a 0-height flash before the
+  // hidden measurement pass below reports in.
+  const [cardTextHeight, setCardTextHeight] = useState(
+    CARD_TEXT_BASE_HEIGHT * PixelRatio.getFontScale()
+  );
+  const measuredMax = useRef(0);
+  const handleMeasureSlide = (e: LayoutChangeEvent) => {
+    const measured = e.nativeEvent.layout.height;
+    // Compare against the running max of real measurements only — comparing
+    // against the fallback state would let a too-generous initial guess
+    // "stick" forever, since Math.max never shrinks.
+    if (measured > measuredMax.current) {
+      measuredMax.current = measured;
+      setCardTextHeight(measured);
+    }
+  };
+
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<Animated.FlatList<OnboardingSlide>>(null);
   const scrollX = useRef(new Animated.Value(0)).current;
@@ -56,7 +91,7 @@ export function OnboardingScreen({ onDone }: Props) {
     {
       useNativeDriver: true,
       listener: (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-        const index = Math.round(e.nativeEvent.contentOffset.x / PAGE_WIDTH);
+        const index = Math.round(e.nativeEvent.contentOffset.x / pageWidth);
         setActiveIndex((prev) => (index !== prev ? index : prev));
       },
     }
@@ -75,11 +110,18 @@ export function OnboardingScreen({ onDone }: Props) {
       <OnboardingCollage />
 
       <View style={styles.card}>
-       <View style={styles.cardInner}>
+       <View style={[styles.cardInner, { paddingBottom: 28 + insets.bottom }]}>
         <CardDotPattern />
+        <View style={styles.measureLayer} pointerEvents="none">
+          {onboardingSlides.map((slide) => (
+            <View key={slide.id} onLayout={handleMeasureSlide}>
+              <SlideText item={slide} />
+            </View>
+          ))}
+        </View>
         <Animated.FlatList
           ref={listRef}
-          style={styles.list}
+          style={{ height: cardTextHeight }}
           data={onboardingSlides}
           keyExtractor={(item) => item.id}
           horizontal
@@ -92,8 +134,8 @@ export function OnboardingScreen({ onDone }: Props) {
           scrollEventThrottle={16}
           initialNumToRender={onboardingSlides.length}
           getItemLayout={(_, index) => ({
-            length: PAGE_WIDTH,
-            offset: PAGE_WIDTH * index,
+            length: pageWidth,
+            offset: pageWidth * index,
             index,
           })}
           renderItem={({ item }) => <SlideText item={item} />}
@@ -105,7 +147,9 @@ export function OnboardingScreen({ onDone }: Props) {
 
         <View style={styles.buttonRow}>
           <Pressable onPress={isFirstSlide ? onDone : handleBack} style={styles.skipButton}>
-            <Text style={styles.skipButtonText}>{isFirstSlide ? 'SKIP' : 'BACK'}</Text>
+            <Text style={[styles.skipButtonText, { fontSize: scaleFont(10.5) }]}>
+              {isFirstSlide ? 'SKIP' : 'BACK'}
+            </Text>
           </Pressable>
           <Pressable onPress={handleNext} style={styles.nextButton}>
             <LinearGradient
@@ -115,12 +159,14 @@ export function OnboardingScreen({ onDone }: Props) {
               end={{ x: 1, y: 0 }}
               style={styles.nextButtonGradient}
             >
-              <Text style={styles.nextButtonText}>{isLastSlide ? 'GET STARTED' : 'NEXT'}</Text>
+              <Text style={[styles.nextButtonText, { fontSize: scaleFont(10.5) }]}>
+                {isLastSlide ? 'GET STARTED' : 'NEXT'}
+              </Text>
             </LinearGradient>
           </Pressable>
         </View>
 
-        <Text style={styles.legalText}>
+        <Text style={[styles.legalText, { fontSize: scaleFont(10) }]}>
           By continuing, you are accepting our{' '}
           {/* TODO: link to actual Terms of Service URL once available */}
           <Text style={styles.legalLink}>Terms of Service</Text> and{' '}
@@ -158,14 +204,12 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     paddingBottom: 28,
   },
-  list: {
-    // fixed rather than left to auto-measure, so the card (and the collage
-    // above it, which fills whatever space is left) doesn't resize as you
-    // swipe between slides with different amounts of text
-    height: 160,
-  },
   slideText: {
-    width: PAGE_WIDTH,
+    // width is set inline per-render from useWindowDimensions
+  },
+  measureLayer: {
+    position: 'absolute',
+    opacity: 0,
   },
   eyebrowRow: {
     flexDirection: 'row',
