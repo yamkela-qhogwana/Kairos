@@ -2,6 +2,7 @@ export const colors = {
   bgTop: '#17181c',
   bgBottom: '#08090b',
   muted: '#8b8d97',
+  text: '#f0f0f2',
 
   dotGold: '#e8c9a0',
   dotBlue: '#a3b9cf',
