@@ -66,6 +66,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    // Solid fallback behind the absolute-fill background SVG — on some
+    // Android devices the SVG's JS-computed width/height comes out a pixel
+    // or two short of the real screen, leaving a sliver of native white.
+    backgroundColor: colors.bgBottom,
   },
   wordmarkRow: {
     flexDirection: 'row',
