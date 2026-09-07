@@ -37,9 +37,6 @@ const STEP_INSTRUCTIONS = [
 // backend-issued OTP until that integration exists.
 const MOCK_OTP = '1234';
 
-const PROPERTY_TYPES = ['House', 'Apartment', 'Complex'] as const;
-type PropertyType = (typeof PROPERTY_TYPES)[number];
-
 type FieldProps = TextInputProps & {
   label: string;
   scaleFont: (size: number) => number;
@@ -68,16 +65,13 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
 
-  const [propertyType, setPropertyType] = useState<PropertyType>('House');
-  const [propertyTypeMenuVisible, setPropertyTypeMenuVisible] = useState(false);
   const [streetAddress, setStreetAddress] = useState('');
-  const [streetAddressLine2, setStreetAddressLine2] = useState('');
-  const [unitNumber, setUnitNumber] = useState('');
+  const [apartmentUnit, setApartmentUnit] = useState('');
   const [suburb, setSuburb] = useState('');
   const [city, setCity] = useState('');
-  const [province, setProvince] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [locating, setLocating] = useState(false);
+  const [useCurrentLocationChecked, setUseCurrentLocationChecked] = useState(false);
 
   const [phone, setPhone] = useState('');
   const [phoneVerified, setPhoneVerified] = useState(false);
@@ -95,12 +89,18 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
   const isLastStep = step === STEP_COUNT - 1;
   const passwordsMismatch = confirmPassword.length > 0 && password !== confirmPassword;
 
-  const handleUseCurrentLocation = async () => {
+  const handleToggleUseCurrentLocation = async () => {
+    if (useCurrentLocationChecked) {
+      setUseCurrentLocationChecked(false);
+      return;
+    }
+    setUseCurrentLocationChecked(true);
     setLocating(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         Alert.alert('Location permission needed', 'Enable location access to autofill your address.');
+        setUseCurrentLocationChecked(false);
         return;
       }
       const position = await Location.getCurrentPositionAsync({});
@@ -114,11 +114,11 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
         const suburbValue = place.subregion ?? place.district ?? '';
         if (suburbValue) setSuburb(suburbValue);
         if (place.city) setCity(place.city);
-        if (place.region) setProvince(place.region);
         if (place.postalCode) setPostalCode(place.postalCode);
       }
     } catch {
       Alert.alert('Could not detect location', 'Please enter your address manually.');
+      setUseCurrentLocationChecked(false);
     } finally {
       setLocating(false);
     }
@@ -177,19 +177,18 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <CardDotPattern />
+
+        <View style={[styles.headerWrap, { paddingTop: insets.top + 48 }]}>
+          <KairosWordmark fontSize={scaleFont(22)} />
+          <Text style={[styles.tagline, { fontSize: scaleFont(9) }]}>SHOP BETTER · SHOP KAIROS</Text>
+        </View>
+
         <ScrollView
-          contentContainerStyle={[
-            styles.content,
-            { paddingTop: insets.top + 48, paddingBottom: insets.bottom + 32 },
-          ]}
+          style={styles.flexFill}
+          contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.headerWrap}>
-            <KairosWordmark fontSize={scaleFont(22)} />
-            <Text style={[styles.tagline, { fontSize: scaleFont(9) }]}>SHOP BETTER · SHOP KAIROS</Text>
-          </View>
-
           <View style={styles.stepIntro}>
             <Text style={[styles.stepLabel, { fontSize: scaleFont(11) }]}>
               STEP {step + 1}/{STEP_COUNT}: {STEP_INSTRUCTIONS[step]}
@@ -198,7 +197,7 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
 
           {step === 0 && (
             <>
-              <Text style={[styles.sectionHeading, { fontSize: scaleFont(11) }]}>PROFILE</Text>
+              <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>PROFILE</Text>
               <View style={styles.row}>
                 <FormField
                   label="FIRST NAME"
@@ -280,20 +279,26 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
 
           {step === 1 && (
             <>
-              <Text style={[styles.sectionHeading, { fontSize: scaleFont(11) }]}>ADDRESS</Text>
+              <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>ADDRESS</Text>
 
-              <View style={styles.field}>
-                <Text style={[styles.fieldLabel, { fontSize: scaleFont(10) }]}>PROPERTY TYPE</Text>
-                <Pressable
-                  onPress={() => setPropertyTypeMenuVisible(true)}
-                  style={styles.selectInput}
+              <Pressable
+                onPress={handleToggleUseCurrentLocation}
+                style={styles.checkboxRow}
+                disabled={locating}
+              >
+                <View
+                  style={[styles.checkbox, useCurrentLocationChecked && styles.checkboxChecked]}
                 >
-                  <Text style={[styles.selectInputText, { fontSize: scaleFont(13) }]}>
-                    {propertyType}
-                  </Text>
-                  <Text style={[styles.selectChevron, { fontSize: scaleFont(11) }]}>▾</Text>
-                </Pressable>
-              </View>
+                  {locating ? (
+                    <ActivityIndicator size="small" color={colors.text} />
+                  ) : useCurrentLocationChecked ? (
+                    <Text style={styles.checkboxTick}>✓</Text>
+                  ) : null}
+                </View>
+                <Text style={[styles.checkboxLabel, { fontSize: scaleFont(10) }]}>
+                  Use my current location to fill this in
+                </Text>
+              </Pressable>
 
               <FormField
                 label="STREET ADDRESS"
@@ -303,23 +308,13 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                 onChangeText={setStreetAddress}
               />
               <FormField
-                label="STREET ADDRESS LINE 2 (OPTIONAL)"
+                label="APARTMENT / UNIT / COMPLEX (OPTIONAL)"
                 scaleFont={scaleFont}
-                placeholder="Building name, floor, etc."
-                value={streetAddressLine2}
-                onChangeText={setStreetAddressLine2}
+                placeholder="e.g. Unit 4B, Ivy Complex"
+                value={apartmentUnit}
+                onChangeText={setApartmentUnit}
               />
               <View style={styles.row}>
-                {propertyType !== 'House' && (
-                  <FormField
-                    label={`${propertyType.toUpperCase()} NUMBER`}
-                    scaleFont={scaleFont}
-                    placeholder="e.g. 4B"
-                    value={unitNumber}
-                    onChangeText={setUnitNumber}
-                    style={styles.rowField}
-                  />
-                )}
                 <FormField
                   label="SUBURB"
                   scaleFont={scaleFont}
@@ -328,22 +323,12 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                   onChangeText={setSuburb}
                   style={styles.rowField}
                 />
-              </View>
-              <View style={styles.row}>
                 <FormField
                   label="CITY"
                   scaleFont={scaleFont}
                   placeholder="Cape Town"
                   value={city}
                   onChangeText={setCity}
-                  style={styles.rowField}
-                />
-                <FormField
-                  label="PROVINCE"
-                  scaleFont={scaleFont}
-                  placeholder="Western Cape"
-                  value={province}
-                  onChangeText={setProvince}
                   style={styles.rowField}
                 />
               </View>
@@ -355,25 +340,12 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                 onChangeText={setPostalCode}
                 keyboardType="number-pad"
               />
-              <Pressable
-                onPress={handleUseCurrentLocation}
-                style={styles.locationButton}
-                disabled={locating}
-              >
-                {locating ? (
-                  <ActivityIndicator size="small" color={colors.dotGold} />
-                ) : (
-                  <Text style={[styles.locationButtonText, { fontSize: scaleFont(10.5) }]}>
-                    USE CURRENT LOCATION
-                  </Text>
-                )}
-              </Pressable>
             </>
           )}
 
           {step === 2 && (
             <>
-              <Text style={[styles.sectionHeading, { fontSize: scaleFont(11) }]}>
+              <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>
                 PHONE VERIFICATION
               </Text>
 
@@ -406,6 +378,9 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
             </>
           )}
 
+        </ScrollView>
+
+        <View style={[styles.footerWrap, { paddingBottom: insets.bottom + 20 }]}>
           <View style={styles.navRow}>
             {!isFirstStep && (
               <Pressable onPress={handleBack} style={styles.backButton}>
@@ -435,43 +410,8 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
               <Text style={[styles.loginLink, { fontSize: scaleFont(11.5) }]}>Log in</Text>
             </Pressable>
           </View>
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
-
-      <Modal
-        visible={propertyTypeMenuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setPropertyTypeMenuVisible(false)}
-      >
-        <Pressable
-          style={styles.modalBackdrop}
-          onPress={() => setPropertyTypeMenuVisible(false)}
-        >
-          <View style={styles.selectMenuCard}>
-            {PROPERTY_TYPES.map((type) => (
-              <Pressable
-                key={type}
-                onPress={() => {
-                  setPropertyType(type);
-                  setPropertyTypeMenuVisible(false);
-                }}
-                style={styles.selectMenuOption}
-              >
-                <Text
-                  style={[
-                    styles.selectMenuOptionText,
-                    propertyType === type && styles.selectMenuOptionTextActive,
-                    { fontSize: scaleFont(13) },
-                  ]}
-                >
-                  {type}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </Pressable>
-      </Modal>
 
       <Modal
         visible={otpModalVisible}
@@ -534,10 +474,15 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 26,
+    paddingBottom: 24,
   },
   headerWrap: {
     alignItems: 'center',
+    paddingHorizontal: 26,
     marginBottom: 20,
+  },
+  footerWrap: {
+    paddingHorizontal: 26,
   },
   tagline: {
     fontFamily: typography.medium,
@@ -593,46 +538,6 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: colors.dotGold,
   },
-  selectInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(232, 201, 160, 0.2)',
-    borderRadius: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  selectInputText: {
-    fontFamily: typography.regular,
-    color: colors.text,
-  },
-  selectChevron: {
-    color: colors.dotGold,
-  },
-  selectMenuCard: {
-    width: '80%',
-    backgroundColor: colors.bgTop,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(232, 201, 160, 0.25)',
-    paddingVertical: 8,
-    overflow: 'hidden',
-  },
-  selectMenuOption: {
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-  },
-  selectMenuOptionText: {
-    fontFamily: typography.medium,
-    color: colors.text,
-    textAlign: 'center',
-  },
-  selectMenuOptionTextActive: {
-    fontFamily: typography.bold,
-    color: colors.dotGold,
-  },
   otpSendButton: {
     marginTop: 8,
   },
@@ -661,17 +566,36 @@ const styles = StyleSheet.create({
     color: colors.error,
     marginTop: 6,
   },
-  locationButton: {
-    alignSelf: 'flex-start',
-    paddingVertical: 6,
-    marginBottom: 4,
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 18,
   },
-  locationButtonText: {
+  checkbox: {
+    width: 16,
+    height: 16,
+    borderRadius: 4,
+    borderWidth: 1.2,
+    borderColor: colors.text,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  checkboxChecked: {
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+  },
+  checkboxTick: {
+    color: colors.text,
     fontFamily: typography.bold,
-    fontSize: 10.5,
-    letterSpacing: 1.3,
-    color: colors.dotGold,
+    fontSize: 10,
+  },
+  checkboxLabel: {
+    fontFamily: typography.semiBold,
+    color: colors.text,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
     textDecorationLine: 'underline',
+    flexShrink: 1,
   },
   navRow: {
     marginTop: 12,
