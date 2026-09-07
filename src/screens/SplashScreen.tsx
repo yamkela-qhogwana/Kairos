@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SplashBackground } from '../components/SplashBackground';
 import { GradientText } from '../components/GradientText';
+import { KairosWordmark } from '../components/KairosWordmark';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { useScaleFont } from '../theme/responsive';
@@ -15,37 +16,7 @@ export function SplashScreen() {
     <View style={styles.container}>
       <SplashBackground />
 
-      <View style={styles.wordmarkRow}>
-        <GradientText
-          colors={colors.wordmarkGradient}
-          locations={colors.wordmarkGradientLocations}
-          style={{ ...styles.wordmarkText, fontSize: scaleFont(38) }}
-        >
-          KAIR
-        </GradientText>
-
-        <View style={styles.oWrap}>
-          <GradientText
-            colors={colors.wordmarkGradient}
-            locations={colors.wordmarkGradientLocations}
-            style={{ ...styles.wordmarkText, fontSize: scaleFont(38) }}
-          >
-            O
-          </GradientText>
-          <View style={styles.dotsRow}>
-            <View style={[styles.dot, { backgroundColor: colors.dotGold }]} />
-            <View style={[styles.dot, { backgroundColor: colors.dotBlue }]} />
-          </View>
-        </View>
-
-        <GradientText
-          colors={colors.wordmarkGradient}
-          locations={colors.wordmarkGradientLocations}
-          style={{ ...styles.wordmarkText, fontSize: scaleFont(38) }}
-        >
-          S
-        </GradientText>
-      </View>
+      <KairosWordmark fontSize={scaleFont(38)} />
 
       <View style={[styles.tagline, { bottom: 60 + insets.bottom }]}>
         <Text style={[styles.taglineLine1, { fontSize: scaleFont(9) }]}>SHOP BETTER</Text>
@@ -70,32 +41,6 @@ const styles = StyleSheet.create({
     // Android devices the SVG's JS-computed width/height comes out a pixel
     // or two short of the real screen, leaving a sliver of native white.
     backgroundColor: colors.bgBottom,
-  },
-  wordmarkRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  wordmarkText: {
-    fontFamily: typography.wordmark,
-    fontSize: 38,
-    letterSpacing: 5,
-  },
-  oWrap: {
-    position: 'relative',
-  },
-  dotsRow: {
-    position: 'absolute',
-    top: -12,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 4,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
   },
   tagline: {
     position: 'absolute',

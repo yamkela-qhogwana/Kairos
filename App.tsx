@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { initialWindowMetrics, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreenNative from 'expo-splash-screen';
@@ -12,8 +12,8 @@ import {
 } from '@expo-google-fonts/montserrat';
 import { SplashScreen } from './src/screens/SplashScreen';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
+import { SignUpScreen } from './src/screens/SignUpScreen';
 import { colors } from './src/theme/colors';
-import { typography } from './src/theme/typography';
 
 SplashScreenNative.preventAutoHideAsync();
 
@@ -54,9 +54,7 @@ export default function App() {
         ) : !onboardingDone ? (
           <OnboardingScreen onDone={() => setOnboardingDone(true)} />
         ) : (
-          <View style={styles.placeholder}>
-            <Text style={styles.placeholderText}>Home screen coming soon</Text>
-          </View>
+          <SignUpScreen />
         )}
       </View>
     </SafeAreaProvider>
@@ -67,16 +65,5 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.bgBottom,
-  },
-  placeholder: {
-    flex: 1,
-    backgroundColor: colors.bgBottom,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderText: {
-    fontFamily: typography.medium,
-    fontSize: 14,
-    color: colors.muted,
   },
 });

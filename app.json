@@ -33,6 +33,12 @@
             "backgroundColor": "#08090b"
           }
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Kairos uses your location to autofill your delivery address."
+        }
       ]
     ]
   }
