@@ -1,42 +1,86 @@
-import React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { initialWindowMetrics, SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as SplashScreenNative from 'expo-splash-screen';
+import {
+  useFonts,
+  Montserrat_400Regular,
+  Montserrat_500Medium,
+  Montserrat_600SemiBold,
+  Montserrat_700Bold,
+} from '@expo-google-fonts/montserrat';
+import { SplashScreen } from './src/screens/SplashScreen';
+import { colors } from './src/theme/colors';
+
+SplashScreenNative.preventAutoHideAsync();
+
+const SPLASH_DURATION_MS = 2200;
 
 function Home() {
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.screen, { paddingTop: insets.top + 24 }]}>
-      <Text style={styles.title}>KAIROS DRIVER</Text>
-      <Text style={styles.subtitle}>Deliveries will show up here.</Text>
-      <StatusBar style="light" />
+    <View style={[styles.home, { paddingTop: insets.top + 24 }]}>
+      <Text style={styles.homeTitle}>KAIROS DRIVER</Text>
+      <Text style={styles.homeSubtitle}>Deliveries will show up here.</Text>
     </View>
   );
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Montserrat_400Regular,
+    Montserrat_500Medium,
+    Montserrat_600SemiBold,
+    Montserrat_700Bold,
+  });
+  const [showSplash, setShowSplash] = useState(true);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreenNative.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  useEffect(() => {
+    if (!fontsLoaded) return;
+    const timer = setTimeout(() => setShowSplash(false), SPLASH_DURATION_MS);
+    return () => clearTimeout(timer);
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <SafeAreaProvider>
-      <Home />
+    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+      <View style={styles.root} onLayout={onLayoutRootView}>
+        <StatusBar style="light" />
+        {showSplash ? <SplashScreen /> : <Home />}
+      </View>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
+  root: {
     flex: 1,
-    backgroundColor: '#17181c',
+    backgroundColor: colors.bgBottom,
+  },
+  home: {
+    flex: 1,
+    backgroundColor: colors.bgTop,
     alignItems: 'center',
   },
-  title: {
+  homeTitle: {
     fontSize: 22,
     fontWeight: '700',
     letterSpacing: 2,
-    color: '#f0f0f2',
+    color: colors.text,
   },
-  subtitle: {
+  homeSubtitle: {
     marginTop: 10,
     fontSize: 13,
-    color: '#8b8d97',
+    color: colors.muted,
   },
 });
