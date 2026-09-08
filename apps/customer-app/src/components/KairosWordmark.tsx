@@ -1,8 +1,8 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import { GradientText } from './GradientText';
-import { colors } from '../theme/colors';
-import { typography } from '../theme/typography';
+import React from "react";
+import { StyleSheet, View } from "react-native";
+import { GradientText } from "./GradientText";
+import { colors } from "../theme/colors";
+import { typography } from "../theme/typography";
 
 type Props = {
   fontSize: number;
@@ -43,13 +43,23 @@ export function KairosWordmark({ fontSize }: Props) {
           <View
             style={[
               styles.dot,
-              { width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: colors.dotGold },
+              {
+                width: dotSize,
+                height: dotSize,
+                borderRadius: dotSize / 2,
+                backgroundColor: colors.dotGold,
+              },
             ]}
           />
           <View
             style={[
               styles.dot,
-              { width: dotSize, height: dotSize, borderRadius: dotSize / 2, backgroundColor: colors.dotBlue },
+              {
+                width: dotSize,
+                height: dotSize,
+                borderRadius: dotSize / 2,
+                backgroundColor: colors.dotBlue,
+              },
             ]}
           />
         </View>
@@ -68,18 +78,18 @@ export function KairosWordmark({ fontSize }: Props) {
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
   },
   oWrap: {
-    position: 'relative',
+    position: "relative",
   },
   dotsRow: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
   },
   dot: {},
 });
