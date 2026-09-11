@@ -11,6 +11,7 @@ import {
   Montserrat_700Bold,
 } from '@expo-google-fonts/montserrat';
 import { SplashScreen } from './src/screens/SplashScreen';
+import { DriverOnboardingScreen } from './src/screens/DriverOnboardingScreen';
 import { colors } from './src/theme/colors';
 
 SplashScreenNative.preventAutoHideAsync();
@@ -35,6 +36,7 @@ export default function App() {
     Montserrat_700Bold,
   });
   const [showSplash, setShowSplash] = useState(true);
+  const [registered, setRegistered] = useState(false);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -56,7 +58,13 @@ export default function App() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <View style={styles.root} onLayout={onLayoutRootView}>
         <StatusBar style="light" />
-        {showSplash ? <SplashScreen /> : <Home />}
+        {showSplash ? (
+          <SplashScreen />
+        ) : !registered ? (
+          <DriverOnboardingScreen onSubmit={() => setRegistered(true)} />
+        ) : (
+          <Home />
+        )}
       </View>
     </SafeAreaProvider>
   );

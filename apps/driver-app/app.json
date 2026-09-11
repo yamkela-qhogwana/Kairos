@@ -11,6 +11,15 @@
     "android": {
       "predictiveBackGestureEnabled": false
     },
-    "web": {}
+    "web": {},
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Kairos Driver uses your photos to upload verification documents.",
+          "cameraPermission": "Kairos Driver uses your camera to take a selfie and photograph documents."
+        }
+      ]
+    ]
   }
 }
