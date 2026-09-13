@@ -34,7 +34,6 @@ export function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@yourstore.co.za"
             required
-            className="md:h-10 min-[1300px]:h-8 min-[1300px]:text-sm"
           />
         </div>
 
@@ -59,7 +58,7 @@ export function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="pr-16 md:h-10 min-[1300px]:h-8 min-[1300px]:text-sm"
+              className="pr-16"
             />
             <button
               type="button"
