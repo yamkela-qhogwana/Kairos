@@ -10,7 +10,7 @@ const gradientStyle = {
 export function KairosWordmark({ tagline = 'FOR VENDORS', className = '' }: Props) {
   return (
     <div className={className}>
-      <h1 className="inline-flex items-end text-4xl font-bold tracking-[0.13em] sm:text-5xl md:text-6xl min-[1300px]:text-5xl">
+      <h1 className="inline-flex items-end text-4xl font-bold tracking-[0.13em] sm:text-5xl">
         <span className="bg-clip-text text-transparent" style={gradientStyle}>
           KAIR
         </span>

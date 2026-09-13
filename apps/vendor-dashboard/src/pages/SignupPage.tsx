@@ -20,12 +20,12 @@ export function SignupPage() {
 
   return (
     <CenteredAuthLayout>
-      <p className="mb-6 text-center text-sm text-brand-muted">
+      <p className="mb-4 text-center text-sm text-brand-muted sm:mb-6">
         Register your store and start selling with Kairos.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="storeName">Store name</Label>
             <Input
@@ -116,7 +116,7 @@ export function SignupPage() {
         </GradientButton>
       </form>
 
-      <p className="mt-8 text-center text-xs text-brand-muted">
+      <p className="mt-4 text-center text-xs text-brand-muted sm:mt-8">
         Already have an account?{' '}
         <Link to="/" className="font-semibold text-brand-gold underline underline-offset-2">
           Log in

@@ -17,13 +17,13 @@ export function LoginPage() {
 
   return (
     <AuthLayout imageSrc={vendorLoginImage}>
-      <p className="mb-6 text-center text-sm text-brand-muted md:text-lg min-[1300px]:text-left min-[1300px]:text-sm">
+      <p className="mb-6 text-center text-sm text-brand-muted md:text-base min-[1300px]:text-left min-[1300px]:text-sm">
         Log in to manage your store, products, and orders.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        <div className="space-y-3">
-          <Label htmlFor="email" className="md:text-base min-[1300px]:text-xs">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="email" className="min-[1300px]:text-xs">
             Email address
           </Label>
           <Input
@@ -34,18 +34,18 @@ export function LoginPage() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@yourstore.co.za"
             required
-            className="md:h-14 md:text-xl min-[1300px]:h-8 min-[1300px]:text-sm"
+            className="md:h-10 min-[1300px]:h-8 min-[1300px]:text-sm"
           />
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between gap-4">
-            <Label htmlFor="password" className="md:text-base min-[1300px]:text-xs">
+            <Label htmlFor="password" className="min-[1300px]:text-xs">
               Password
             </Label>
             <button
               type="button"
-              className="text-xs font-semibold uppercase tracking-wide text-brand-gold underline underline-offset-2 md:text-base min-[1300px]:text-xs"
+              className="text-xs font-semibold uppercase tracking-wide text-brand-gold underline underline-offset-2"
             >
               Forgot password?
             </button>
@@ -59,24 +59,24 @@ export function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="pr-16 md:h-14 md:text-xl min-[1300px]:h-8 min-[1300px]:text-sm"
+              className="pr-16 md:h-10 min-[1300px]:h-8 min-[1300px]:text-sm"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wide text-brand-muted md:text-base min-[1300px]:text-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-wide text-brand-muted"
             >
               {showPassword ? 'Hide' : 'Show'}
             </button>
           </div>
         </div>
 
-        <GradientButton type="submit" className="mt-4 md:py-5 md:text-xl min-[1300px]:py-3 min-[1300px]:text-sm">
+        <GradientButton type="submit" className="mt-2 min-[1300px]:py-3 min-[1300px]:text-sm">
           Log in
         </GradientButton>
       </form>
 
-      <p className="mt-8 text-center text-xs text-brand-muted md:text-base min-[1300px]:text-left min-[1300px]:text-xs">
+      <p className="mt-6 text-center text-xs text-brand-muted min-[1300px]:text-left">
         New to Kairos?{' '}
         <Link to="/signup" className="font-semibold text-brand-gold underline underline-offset-2">
           Register your store

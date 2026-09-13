@@ -23,14 +23,14 @@ export function CenteredAuthLayout({ children }: Props) {
         <rect width="100%" height="100%" fill="url(#vendor-page-dot-grid)" />
       </svg>
 
-      <div className="relative z-10 flex min-h-screen w-full items-center justify-center px-6 py-12">
+      <div className="relative z-10 flex min-h-screen w-full px-6 py-6 sm:py-10 lg:py-12">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="w-full max-w-lg rounded-2xl border border-white/10 bg-brand-bg-bottom/70 p-10 shadow-2xl backdrop-blur-xl sm:max-w-xl lg:max-w-3xl lg:p-12"
+          className="m-auto w-full max-w-lg rounded-2xl border border-white/10 bg-brand-bg-bottom/70 p-6 shadow-2xl backdrop-blur-xl sm:max-w-xl sm:p-8 lg:max-w-3xl lg:p-12"
         >
-          <KairosWordmark className="mb-8 text-center" />
+          <KairosWordmark className="mb-4 text-center sm:mb-8" />
           {children}
         </motion.div>
       </div>
