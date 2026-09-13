@@ -12,6 +12,8 @@ import {
 } from '@expo-google-fonts/montserrat';
 import { SplashScreen } from './src/screens/SplashScreen';
 import { DriverOnboardingScreen } from './src/screens/DriverOnboardingScreen';
+import { DriverLoginScreen } from './src/screens/DriverLoginScreen';
+import { DriverForgotPasswordScreen } from './src/screens/DriverForgotPasswordScreen';
 import { colors } from './src/theme/colors';
 
 SplashScreenNative.preventAutoHideAsync();
@@ -37,6 +39,7 @@ export default function App() {
   });
   const [showSplash, setShowSplash] = useState(true);
   const [registered, setRegistered] = useState(false);
+  const [authScreen, setAuthScreen] = useState<'signup' | 'login' | 'forgotPassword'>('signup');
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -60,10 +63,25 @@ export default function App() {
         <StatusBar style="light" />
         {showSplash ? (
           <SplashScreen />
-        ) : !registered ? (
-          <DriverOnboardingScreen onSubmit={() => setRegistered(true)} />
-        ) : (
+        ) : registered ? (
           <Home />
+        ) : authScreen === 'login' ? (
+          <DriverLoginScreen
+            onSubmit={() => setRegistered(true)}
+            onSignUpPress={() => setAuthScreen('signup')}
+            onForgotPasswordPress={() => setAuthScreen('forgotPassword')}
+          />
+        ) : authScreen === 'forgotPassword' ? (
+          <DriverForgotPasswordScreen
+            onOtpVerified={() => setAuthScreen('login')}
+            onLoginPress={() => setAuthScreen('login')}
+            onSignUpPress={() => setAuthScreen('signup')}
+          />
+        ) : (
+          <DriverOnboardingScreen
+            onSubmit={() => setRegistered(true)}
+            onLoginPress={() => setAuthScreen('login')}
+          />
         )}
       </View>
     </SafeAreaProvider>

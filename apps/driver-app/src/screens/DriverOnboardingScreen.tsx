@@ -25,9 +25,10 @@ import { useScaleFont } from '../theme/responsive';
 
 type Props = {
   onSubmit?: () => void;
+  onLoginPress?: () => void;
 };
 
-const STEP_COUNT = 7;
+const STEP_COUNT = 9;
 // No SMS provider wired up yet — this fixed code stands in for the real
 // backend-issued OTP until that integration exists.
 const MOCK_OTP = '1234';
@@ -54,7 +55,7 @@ function FormField({ label, scaleFont, style, ...inputProps }: FieldProps) {
   );
 }
 
-export function DriverOnboardingScreen({ onSubmit }: Props) {
+export function DriverOnboardingScreen({ onSubmit, onLoginPress }: Props) {
   const insets = useSafeAreaInsets();
   const scaleFont = useScaleFont();
 
@@ -85,6 +86,7 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
 
   // Step 3 — vehicle
   const [vehicleType, setVehicleType] = useState<VehicleType>('Car');
+  const [vehicleTypeModalVisible, setVehicleTypeModalVisible] = useState(false);
   const [vehicleMake, setVehicleMake] = useState('');
   const [vehicleModel, setVehicleModel] = useState('');
   const [vehicleYear, setVehicleYear] = useState('');
@@ -285,6 +287,14 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
                 onPressBack={() => pickImage(setIdDocumentBackUri)}
                 scaleFont={scaleFont}
               />
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>
+                SELFIE VERIFICATION
+              </Text>
               <UploadField
                 label="SELFIE"
                 hint="A clear photo of your face, used to match against your ID."
@@ -295,7 +305,7 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
             </>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
             <>
               <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>
                 DRIVER'S LICENSE
@@ -326,7 +336,7 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
             </>
           )}
 
-          {step === 3 && (
+          {step === 4 && (
             <>
               <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>
                 PROFESSIONAL DRIVING PERMIT
@@ -348,32 +358,20 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
             </>
           )}
 
-          {step === 4 && (
+          {step === 5 && (
             <>
               <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>
                 VEHICLE DETAILS
               </Text>
               <View style={styles.field}>
                 <Text style={[styles.fieldLabel, { fontSize: scaleFont(10) }]}>VEHICLE TYPE</Text>
-                <View style={styles.chipRow}>
-                  {VEHICLE_TYPES.map((type) => (
-                    <Pressable
-                      key={type}
-                      onPress={() => setVehicleType(type)}
-                      style={[styles.chip, vehicleType === type && styles.chipActive]}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          vehicleType === type && styles.chipTextActive,
-                          { fontSize: scaleFont(10) },
-                        ]}
-                      >
-                        {type.toUpperCase()}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </View>
+                <Pressable
+                  onPress={() => setVehicleTypeModalVisible(true)}
+                  style={[styles.input, styles.selectInput]}
+                >
+                  <Text style={{ fontSize: scaleFont(13), color: colors.text }}>{vehicleType}</Text>
+                  <Text style={[styles.selectChevron, { fontSize: scaleFont(13) }]}>⌄</Text>
+                </Pressable>
               </View>
               <View style={styles.row}>
                 <FormField
@@ -413,6 +411,14 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
                   style={styles.rowField}
                 />
               </View>
+            </>
+          )}
+
+          {step === 6 && (
+            <>
+              <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>
+                VEHICLE REGISTRATION
+              </Text>
               <UploadField
                 label="VEHICLE REGISTRATION"
                 hint="A clear photo of your vehicle registration document."
@@ -423,7 +429,7 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
             </>
           )}
 
-          {step === 5 && (
+          {step === 7 && (
             <>
               <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>
                 BANKING DETAILS
@@ -462,7 +468,7 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
             </>
           )}
 
-          {step === 6 && (
+          {step === 8 && (
             <>
               <Text style={{ ...styles.sectionHeading, fontSize: scaleFont(11) }}>
                 PHONE VERIFICATION
@@ -518,6 +524,15 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
               </LinearGradient>
             </Pressable>
           </View>
+
+          <View style={styles.loginRow}>
+            <Text style={[styles.loginText, { fontSize: scaleFont(11.5) }]}>
+              Already have an account?{' '}
+            </Text>
+            <Pressable onPress={onLoginPress} hitSlop={8}>
+              <Text style={[styles.loginLink, { fontSize: scaleFont(11.5) }]}>Log in</Text>
+            </Pressable>
+          </View>
         </View>
       </KeyboardAvoidingView>
 
@@ -567,6 +582,52 @@ export function DriverOnboardingScreen({ onSubmit }: Props) {
             </Pressable>
           </View>
         </View>
+      </Modal>
+
+      <Modal
+        visible={vehicleTypeModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setVehicleTypeModalVisible(false)}
+      >
+        <Pressable
+          style={styles.modalBackdrop}
+          onPress={() => setVehicleTypeModalVisible(false)}
+        >
+          <View style={styles.modalCard}>
+            <Text style={[styles.modalTitle, { fontSize: scaleFont(13) }]}>Vehicle type</Text>
+            {VEHICLE_TYPES.map((type) => (
+              <Pressable
+                key={type}
+                onPress={() => {
+                  setVehicleType(type);
+                  setVehicleTypeModalVisible(false);
+                }}
+                style={styles.selectOption}
+              >
+                <Text
+                  style={[
+                    styles.selectOptionText,
+                    { fontSize: scaleFont(13) },
+                    vehicleType === type && styles.selectOptionTextActive,
+                  ]}
+                >
+                  {type}
+                </Text>
+                {vehicleType === type && (
+                  <Text style={[styles.selectOptionCheck, { fontSize: scaleFont(13) }]}>✓</Text>
+                )}
+              </Pressable>
+            ))}
+            <Pressable
+              onPress={() => setVehicleTypeModalVisible(false)}
+              hitSlop={8}
+              style={styles.modalCancel}
+            >
+              <Text style={[styles.modalCancelText, { fontSize: scaleFont(10.5) }]}>Cancel</Text>
+            </Pressable>
+          </View>
+        </Pressable>
       </Modal>
     </View>
   );
@@ -646,29 +707,31 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     color: colors.dotGold,
   },
-  chipRow: {
+  selectInput: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(232, 201, 160, 0.25)',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-  },
-  chipActive: {
-    borderColor: colors.dotGold,
-    backgroundColor: 'rgba(232, 201, 160, 0.14)',
-  },
-  chipText: {
-    fontFamily: typography.semiBold,
-    letterSpacing: 1,
+  selectChevron: {
     color: colors.muted,
   },
-  chipTextActive: {
+  selectOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 13,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  selectOptionText: {
+    fontFamily: typography.regular,
+    color: colors.text,
+  },
+  selectOptionTextActive: {
+    fontFamily: typography.semiBold,
+    color: colors.dotGold,
+  },
+  selectOptionCheck: {
     color: colors.dotGold,
   },
   otpSendButton: {
@@ -703,6 +766,22 @@ const styles = StyleSheet.create({
     marginTop: 12,
     flexDirection: 'row',
     gap: 10,
+  },
+  loginRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  loginText: {
+    fontFamily: typography.regular,
+    fontSize: 11.5,
+    color: colors.muted,
+  },
+  loginLink: {
+    fontFamily: typography.semiBold,
+    fontSize: 11.5,
+    color: colors.dotGold,
+    textDecorationLine: 'underline',
   },
   backButton: {
     flex: 1,
