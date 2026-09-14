@@ -139,129 +139,77 @@ export function SignupPage() {
               {step === 0 && (
                 <div className="space-y-4">
                   <StepIntro step={step} title="Store details" />
-                  <div className="space-y-2">
-                    <Label htmlFor="storeName">Store name</Label>
-                    <Input
-                      id="storeName"
-                      value={storeName}
-                      onChange={(e) => setStoreName(e.target.value)}
-                      placeholder="e.g. Thando's Boutique"
-                      required
-                    />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="storeName">Store name</Label>
+                      <Input
+                        id="storeName"
+                        value={storeName}
+                        onChange={(e) => setStoreName(e.target.value)}
+                        placeholder="e.g. Thando's Boutique"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="businessRegNumber">Business reg. no.</Label>
+                      <Input
+                        id="businessRegNumber"
+                        value={businessRegNumber}
+                        onChange={(e) => setBusinessRegNumber(e.target.value)}
+                        placeholder="e.g. 2021/123456/07"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               )}
 
               {step === 1 && (
                 <div className="space-y-4">
-                  <StepIntro step={step} title="Business registration" />
-                  <p className="-mt-3 text-xs text-brand-muted">
-                    Used to verify your business is legally registered.
-                  </p>
-                  <div className="space-y-2">
-                    <Label htmlFor="businessRegNumber">Business registration number</Label>
-                    <Input
-                      id="businessRegNumber"
-                      value={businessRegNumber}
-                      onChange={(e) => setBusinessRegNumber(e.target.value)}
-                      placeholder="e.g. 2021/123456/07"
-                      required
-                    />
+                  <StepIntro step={step} title="Primary contact" />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="contactName">Contact name</Label>
+                      <Input
+                        id="contactName"
+                        value={contactName}
+                        onChange={(e) => setContactName(e.target.value)}
+                        placeholder="Your full name"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@yourstore.co.za"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2 sm:col-span-2">
+                      <Label htmlFor="phone">Cellphone number</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        autoComplete="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="e.g. 082 123 4567"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               )}
 
               {step === 2 && (
-                <div className="space-y-4">
-                  <StepIntro step={step} title="Primary contact" />
-                  <div className="space-y-2">
-                    <Label htmlFor="contactName">Contact name</Label>
-                    <Input
-                      id="contactName"
-                      value={contactName}
-                      onChange={(e) => setContactName(e.target.value)}
-                      placeholder="Your full name"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@yourstore.co.za"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Cellphone number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      autoComplete="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="e.g. 082 123 4567"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="whatsappNumber">WhatsApp number</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        id="whatsappNumber"
-                        type="tel"
-                        value={whatsappNumber}
-                        onChange={(e) => setWhatsappNumber(e.target.value)}
-                        placeholder="e.g. 082 123 4567"
-                        required
-                        disabled={whatsappVerified}
-                        className="flex-1"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleSendWhatsappOtp}
-                        disabled={whatsappVerified}
-                        className="shrink-0 rounded-lg border border-brand-gold/25 bg-white/[0.04] px-4 text-xs font-bold tracking-wide text-brand-gold uppercase disabled:opacity-60"
-                      >
-                        {whatsappVerified ? 'Verified ✓' : whatsappOtpSent ? 'Resend' : 'Send code'}
-                      </button>
-                    </div>
-
-                    {whatsappOtpSent && !whatsappVerified ? (
-                      <div className="space-y-1 pt-1">
-                        <div className="flex gap-2">
-                          <Input
-                            value={whatsappOtp}
-                            onChange={(e) => setWhatsappOtp(e.target.value)}
-                            placeholder="Enter code"
-                            inputMode="numeric"
-                            className="flex-1"
-                          />
-                          <button
-                            type="button"
-                            onClick={handleVerifyWhatsappOtp}
-                            className="shrink-0 rounded-lg border border-brand-gold/25 bg-white/[0.04] px-4 text-xs font-bold tracking-wide text-brand-text uppercase"
-                          >
-                            Verify
-                          </button>
-                        </div>
-                        <p className="text-xs text-brand-muted">
-                          Enter the code sent to WhatsApp (use {MOCK_OTP} for testing).
-                        </p>
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              )}
-
-              {step === 3 && (
                 <div className="space-y-4">
                   <StepIntro step={step} title="Store address" />
                   <p className="-mt-3 text-xs text-brand-muted">
@@ -279,136 +227,200 @@ export function SignupPage() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="mallName">Mall / shopping centre</Label>
-                    <Input
-                      id="mallName"
-                      value={mallName}
-                      onChange={(e) => setMallName(e.target.value)}
-                      placeholder="e.g. Sandton City (if applicable)"
-                    />
-                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="mallName">Mall / shopping centre</Label>
+                      <Input
+                        id="mallName"
+                        value={mallName}
+                        onChange={(e) => setMallName(e.target.value)}
+                        placeholder="e.g. Dragon City"
+                      />
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="shopNumber">Shop / unit number</Label>
-                    <Input
-                      id="shopNumber"
-                      value={shopNumber}
-                      onChange={(e) => setShopNumber(e.target.value)}
-                      placeholder="e.g. Shop 14, Upper Level"
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="shopNumber">Shop / unit number</Label>
+                      <Input
+                        id="shopNumber"
+                        value={shopNumber}
+                        onChange={(e) => setShopNumber(e.target.value)}
+                        placeholder="e.g. Shop 14, Upper Level"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="space-y-4">
+                  <StepIntro step={step} title="Location" />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="suburb">Suburb</Label>
+                      <Input
+                        id="suburb"
+                        value={suburb}
+                        onChange={(e) => setSuburb(e.target.value)}
+                        placeholder="e.g. Rosebank"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="city">City / town</Label>
+                      <Input
+                        id="city"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="e.g. Johannesburg"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="province">Province</Label>
+                      <select
+                        id="province"
+                        value={province}
+                        onChange={(e) => setProvince(e.target.value)}
+                        required
+                        className={selectClassName}
+                        style={selectChevronStyle}
+                      >
+                        <option value="" disabled>
+                          Select a province
+                        </option>
+                        {PROVINCES.map((p) => (
+                          <option key={p} value={p}>
+                            {p}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="postalCode">Postal code</Label>
+                      <Input
+                        id="postalCode"
+                        inputMode="numeric"
+                        value={postalCode}
+                        onChange={(e) => setPostalCode(e.target.value)}
+                        placeholder="e.g. 2196"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               )}
 
               {step === 4 && (
                 <div className="space-y-4">
-                  <StepIntro step={step} title="Location" />
-                  <div className="space-y-2">
-                    <Label htmlFor="suburb">Suburb</Label>
-                    <Input
-                      id="suburb"
-                      value={suburb}
-                      onChange={(e) => setSuburb(e.target.value)}
-                      placeholder="e.g. Rosebank"
-                      required
-                    />
-                  </div>
+                  <StepIntro step={step} title="Banking details" />
+                  <p className="-mt-3 text-xs text-brand-muted">Where we'll pay out your sales.</p>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="bankName">Bank name</Label>
+                      <Input
+                        id="bankName"
+                        value={bankName}
+                        onChange={(e) => setBankName(e.target.value)}
+                        placeholder="e.g. Standard Bank"
+                        required
+                      />
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City / town</Label>
-                    <Input
-                      id="city"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder="e.g. Johannesburg"
-                      required
-                    />
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="accountHolder">Account holder name</Label>
+                      <Input
+                        id="accountHolder"
+                        value={accountHolder}
+                        onChange={(e) => setAccountHolder(e.target.value)}
+                        placeholder="e.g. Sam Trading"
+                        required
+                      />
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="province">Province</Label>
-                    <select
-                      id="province"
-                      value={province}
-                      onChange={(e) => setProvince(e.target.value)}
-                      required
-                      className={selectClassName}
-                      style={selectChevronStyle}
-                    >
-                      <option value="" disabled>
-                        Select a province
-                      </option>
-                      {PROVINCES.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="accountNumber">Account number</Label>
+                      <Input
+                        id="accountNumber"
+                        inputMode="numeric"
+                        value={accountNumber}
+                        onChange={(e) => setAccountNumber(e.target.value)}
+                        placeholder="1234567890"
+                        required
+                      />
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="postalCode">Postal code</Label>
-                    <Input
-                      id="postalCode"
-                      inputMode="numeric"
-                      value={postalCode}
-                      onChange={(e) => setPostalCode(e.target.value)}
-                      placeholder="e.g. 2196"
-                      required
-                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="branchCode">Branch code</Label>
+                      <Input
+                        id="branchCode"
+                        inputMode="numeric"
+                        value={branchCode}
+                        onChange={(e) => setBranchCode(e.target.value)}
+                        placeholder="e.g. 051001"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
               )}
 
               {step === 5 && (
                 <div className="space-y-4">
-                  <StepIntro step={step} title="Banking details" />
-                  <p className="-mt-3 text-xs text-brand-muted">Where we'll pay out your sales.</p>
+                  <StepIntro step={step} title="WhatsApp verification" />
+                  <p className="-mt-3 text-xs text-brand-muted">
+                    We'll send order updates to this number.
+                  </p>
                   <div className="space-y-2">
-                    <Label htmlFor="bankName">Bank name</Label>
-                    <Input
-                      id="bankName"
-                      value={bankName}
-                      onChange={(e) => setBankName(e.target.value)}
-                      placeholder="e.g. Standard Bank"
-                      required
-                    />
-                  </div>
+                    <Label htmlFor="whatsappNumber">WhatsApp number</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="whatsappNumber"
+                        type="tel"
+                        value={whatsappNumber}
+                        onChange={(e) => setWhatsappNumber(e.target.value)}
+                        placeholder="e.g. 082 123 4567"
+                        required
+                        disabled={whatsappVerified}
+                        className="min-w-0 flex-1"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleSendWhatsappOtp}
+                        disabled={whatsappVerified}
+                        className="shrink-0 rounded-lg border border-brand-gold/25 bg-white/[0.04] px-4 text-xs font-bold tracking-wide text-brand-gold uppercase disabled:opacity-60"
+                      >
+                        {whatsappVerified ? 'Verified ✓' : whatsappOtpSent ? 'Resend' : 'Send code'}
+                      </button>
+                    </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="accountHolder">Account holder name</Label>
-                    <Input
-                      id="accountHolder"
-                      value={accountHolder}
-                      onChange={(e) => setAccountHolder(e.target.value)}
-                      placeholder="As it appears on your account"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="accountNumber">Account number</Label>
-                    <Input
-                      id="accountNumber"
-                      inputMode="numeric"
-                      value={accountNumber}
-                      onChange={(e) => setAccountNumber(e.target.value)}
-                      placeholder="1234567890"
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="branchCode">Branch code</Label>
-                    <Input
-                      id="branchCode"
-                      inputMode="numeric"
-                      value={branchCode}
-                      onChange={(e) => setBranchCode(e.target.value)}
-                      placeholder="e.g. 051001"
-                      required
-                    />
+                    {whatsappOtpSent && !whatsappVerified ? (
+                      <div className="space-y-2 pt-1">
+                        <Label htmlFor="whatsappOtp">Enter code</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="whatsappOtp"
+                            value={whatsappOtp}
+                            onChange={(e) => setWhatsappOtp(e.target.value)}
+                            placeholder="Enter code"
+                            inputMode="numeric"
+                            className="min-w-0 flex-1"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleVerifyWhatsappOtp}
+                            className="shrink-0 rounded-lg border border-brand-gold/25 bg-white/[0.04] px-4 text-xs font-bold tracking-wide text-brand-text uppercase"
+                          >
+                            Verify
+                          </button>
+                        </div>
+                        <p className="text-xs text-brand-muted">
+                          Enter the code sent to WhatsApp (use {MOCK_OTP} for testing).
+                        </p>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               )}
@@ -473,7 +485,7 @@ export function SignupPage() {
         </div>
       </form>
 
-      {isFirstStep ? (
+      {!isLastStep ? (
         <p className="mt-6 text-center text-xs text-brand-muted min-[1300px]:text-left">
           Already have an account?{' '}
           <Link to="/" className="font-semibold text-brand-gold underline underline-offset-2">

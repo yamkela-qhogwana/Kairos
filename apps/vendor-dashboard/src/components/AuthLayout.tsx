@@ -38,7 +38,7 @@ export function AuthLayout({ children, imageSrc }: Props) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="m-auto max-h-[85vh] w-full max-w-sm overflow-y-auto rounded-none border border-white/10 bg-brand-bg-bottom/90 p-8 pt-10 shadow-2xl backdrop-blur-xl sm:max-w-md md:max-w-lg md:p-10 min-[1300px]:max-w-sm min-[1300px]:rounded-2xl min-[1300px]:border-none min-[1300px]:bg-transparent min-[1300px]:p-0 min-[1300px]:shadow-none min-[1300px]:backdrop-blur-none"
+          className="m-auto max-h-[85vh] w-full max-w-sm overflow-x-visible overflow-y-auto rounded-none border border-white/10 bg-brand-bg-bottom/90 p-8 pt-10 shadow-2xl backdrop-blur-xl sm:max-w-md md:max-w-lg md:p-10 min-[1300px]:rounded-2xl! min-[1300px]:border-none! min-[1300px]:bg-transparent! min-[1300px]:p-0! min-[1300px]:shadow-none! min-[1300px]:backdrop-blur-none! min-[1300px]:max-w-md!"
         >
           <KairosWordmark className="mb-6 text-center min-[1300px]:text-left" />
           {children}
