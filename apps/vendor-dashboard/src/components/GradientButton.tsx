@@ -6,7 +6,7 @@ export function GradientButton({ className = '', children, ...props }: Props) {
   return (
     <button
       {...props}
-      className={`w-full rounded-lg py-3 text-sm font-bold tracking-wide text-brand-bg-bottom uppercase transition-transform active:scale-[0.98] ${className}`}
+      className={`w-full rounded-lg py-3 text-sm font-bold tracking-wide text-brand-bg-bottom uppercase transition-transform active:scale-[0.98] [@media(max-height:640px)]:py-2! [@media(max-height:640px)]:text-xs! ${className}`}
       style={{
         backgroundImage:
           'linear-gradient(90deg, #e8c9a0 0%, #ddaba8 35%, #c6a3c9 65%, #a3b9cf 100%)',

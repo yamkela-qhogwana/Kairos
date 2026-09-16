@@ -137,5 +137,30 @@
     }
   html {
     @apply font-sans;
+    /* Reserve scrollbar space up front so its appearance never narrows
+       the viewport mid-layout — that narrowing can wrap text onto an
+       extra line, making content taller and triggering a scrollbar that
+       wasn't actually needed in the first place. */
+    scrollbar-gutter: stable;
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(232, 201, 160, 0.35) transparent;
+    }
+
+  /* WebKit (Chrome/Edge/Safari) — thin, brand-tinted scrollbar instead of
+     the default light-grey OS scrollbar clashing with the dark theme. */
+  ::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+    }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    }
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(232, 201, 160, 0.35);
+    border-radius: 999px;
+    }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(232, 201, 160, 0.55);
     }
 }

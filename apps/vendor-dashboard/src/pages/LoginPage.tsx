@@ -17,11 +17,11 @@ export function LoginPage() {
 
   return (
     <AuthLayout imageSrc={vendorLoginImage}>
-      <p className="mb-6 text-center text-sm text-brand-muted md:text-base min-[1300px]:text-left min-[1300px]:text-sm">
+      <p className="mb-6 text-center text-sm text-brand-muted md:text-base min-[1300px]:text-left min-[1300px]:text-sm [@media(max-height:640px)]:mb-3! [@media(max-height:640px)]:text-xs!">
         Log in to manage your store, products, and orders.
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-6 [@media(max-height:640px)]:space-y-3!">
         <div className="space-y-2">
           <Label htmlFor="email" className="min-[1300px]:text-xs">
             Email address
@@ -75,7 +75,7 @@ export function LoginPage() {
         </GradientButton>
       </form>
 
-      <p className="mt-6 text-center text-xs text-brand-muted min-[1300px]:text-left">
+      <p className="mt-6 text-center text-xs text-brand-muted min-[1300px]:text-left [@media(max-height:640px)]:mt-3!">
         New to Kairos?{' '}
         <Link to="/signup" className="font-semibold text-brand-gold underline underline-offset-2">
           Register your store

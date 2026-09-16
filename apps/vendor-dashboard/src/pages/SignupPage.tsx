@@ -23,7 +23,7 @@ const STEP_COUNT = 7;
 const MOCK_OTP = '1234';
 
 const selectClassName =
-  '[color-scheme:dark] h-10 w-full min-w-0 appearance-none rounded-lg border border-input bg-transparent bg-no-repeat py-2 pr-9 pl-3 text-base text-brand-text outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30';
+  '[color-scheme:dark] h-10 w-full min-w-0 appearance-none rounded-lg border border-input bg-transparent bg-no-repeat py-2 pr-9 pl-3 text-base text-brand-text outline-none transition-colors focus-visible:border-ring md:text-sm dark:bg-input/30';
 
 const selectChevronStyle = {
   backgroundImage:
@@ -44,11 +44,13 @@ const stepVariants = {
 
 function StepIntro({ step, title }: { step: number; title: string }) {
   return (
-    <div className="mb-5">
-      <p className="text-[11px] font-bold tracking-[0.2em] text-brand-gold uppercase">
+    <div className="mb-5 [@media(max-height:640px)]:mb-2!">
+      <p className="text-[11px] font-bold tracking-[0.2em] text-brand-gold uppercase [@media(max-height:640px)]:text-[10px]!">
         Step {step + 1}/{STEP_COUNT}
       </p>
-      <h2 className="mt-1 text-sm font-bold tracking-[0.1em] text-brand-text uppercase">{title}</h2>
+      <h2 className="mt-1 text-xs font-bold tracking-[0.1em] text-brand-text uppercase sm:text-sm">
+        {title}
+      </h2>
     </div>
   );
 }
@@ -111,20 +113,20 @@ export function SignupPage() {
   return (
     <AuthLayout imageSrc={vendorLoginImage}>
       <p
-        className="mb-6 bg-clip-text text-center text-xl font-bold tracking-[0.2em] text-transparent uppercase min-[1300px]:text-left"
+        className="mb-6 bg-clip-text text-center text-lg font-bold tracking-[0.2em] text-transparent uppercase min-[1300px]:text-left min-[1300px]:text-xl [@media(max-height:640px)]:mb-3! [@media(max-height:640px)]:text-base!"
         style={gradientTextStyle}
       >
         Registration form
       </p>
 
       {isFirstStep ? (
-        <p className="mb-6 text-center text-sm text-brand-muted min-[1300px]:text-left">
+        <p className="mb-6 text-center text-sm text-brand-muted min-[1300px]:text-left [@media(max-height:640px)]:mb-3! [@media(max-height:640px)]:text-xs!">
           Register your store and start selling with Kairos.
         </p>
       ) : null}
 
       {/* Validation temporarily disabled while reviewing the screens. */}
-      <form onSubmit={handleSubmit} noValidate className="space-y-6">
+      <form onSubmit={handleSubmit} noValidate className="space-y-6 [@media(max-height:640px)]:space-y-3!">
         <div className="overflow-hidden">
           <AnimatePresence mode="wait" custom={direction} initial={false}>
             <motion.div
@@ -486,7 +488,7 @@ export function SignupPage() {
       </form>
 
       {!isLastStep ? (
-        <p className="mt-6 text-center text-xs text-brand-muted min-[1300px]:text-left">
+        <p className="mt-6 text-center text-xs text-brand-muted min-[1300px]:text-left [@media(max-height:640px)]:mt-3!">
           Already have an account?{' '}
           <Link to="/" className="font-semibold text-brand-gold underline underline-offset-2">
             Log in
