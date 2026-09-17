@@ -39,7 +39,8 @@
         {
           "locationWhenInUsePermission": "Kairos uses your location to autofill your delivery address."
         }
-      ]
+      ],
+      "expo-secure-store"
     ]
   }
 }

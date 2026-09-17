@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
+  Easing,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -21,11 +23,32 @@ import { KairosWordmark } from '../components/KairosWordmark';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { useScaleFont } from '../theme/responsive';
+import { registerUser, ApiError, AuthResponse } from '../api/auth';
+import { saveToken } from '../api/tokenStorage';
 
 type Props = {
-  onSubmit?: () => void;
+  onSubmit?: (result: AuthResponse) => void;
   onLoginPress?: () => void;
 };
+
+type Country = {
+  code: string;
+  name: string;
+  flag: string;
+  dialCode: string;
+  digits: number;
+};
+
+const COUNTRIES: Country[] = [
+  { code: 'ZA', name: 'South Africa', flag: '🇿🇦', dialCode: '+27', digits: 9 },
+  { code: 'NA', name: 'Namibia', flag: '🇳🇦', dialCode: '+264', digits: 9 },
+  { code: 'BW', name: 'Botswana', flag: '🇧🇼', dialCode: '+267', digits: 8 },
+  { code: 'ZW', name: 'Zimbabwe', flag: '🇿🇼', dialCode: '+263', digits: 9 },
+  { code: 'KE', name: 'Kenya', flag: '🇰🇪', dialCode: '+254', digits: 9 },
+  { code: 'NG', name: 'Nigeria', flag: '🇳🇬', dialCode: '+234', digits: 10 },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', dialCode: '+44', digits: 10 },
+  { code: 'US', name: 'United States', flag: '🇺🇸', dialCode: '+1', digits: 10 },
+];
 
 const STEP_COUNT = 3;
 const STEP_INSTRUCTIONS = [
@@ -36,23 +59,76 @@ const STEP_INSTRUCTIONS = [
 // No SMS provider wired up yet — this fixed code stands in for the real
 // backend-issued OTP until that integration exists.
 const MOCK_OTP = '1234';
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function FieldError({ message, scaleFont }: { message?: string; scaleFont: (size: number) => number }) {
+  if (!message) return null;
+  return (
+    <View style={styles.fieldErrorRow}>
+      <View style={styles.fieldErrorIcon}>
+        <Text style={styles.fieldErrorIconText}>✕</Text>
+      </View>
+      <Text style={[styles.fieldErrorText, { fontSize: scaleFont(9.5) }]}>{message}</Text>
+    </View>
+  );
+}
 
 type FieldProps = TextInputProps & {
   label: string;
   scaleFont: (size: number) => number;
   style?: object;
+  error?: string;
 };
 
-function FormField({ label, scaleFont, style, ...inputProps }: FieldProps) {
+function FormField({ label, scaleFont, style, error, ...inputProps }: FieldProps) {
   return (
     <View style={[styles.field, style]}>
       <Text style={[styles.fieldLabel, { fontSize: scaleFont(10) }]}>{label}</Text>
       <TextInput
         placeholderTextColor={colors.muted}
-        style={[styles.input, { fontSize: scaleFont(13) }]}
+        style={[styles.input, { fontSize: scaleFont(13) }, error ? styles.inputError : null]}
+        autoCorrect={false}
+        spellCheck={false}
         {...inputProps}
       />
+      <FieldError message={error} scaleFont={scaleFont} />
     </View>
+  );
+}
+
+function MaskedPasswordInput({
+  value,
+  onChangeText,
+  onBlur,
+  visible,
+  placeholder,
+  scaleFont,
+  error,
+  style,
+}: {
+  value: string;
+  onChangeText: (text: string) => void;
+  onBlur?: () => void;
+  visible: boolean;
+  placeholder: string;
+  scaleFont: (size: number) => number;
+  error?: string;
+  style?: object;
+}) {
+  return (
+    <TextInput
+      placeholderTextColor={colors.muted}
+      style={[styles.input, { fontSize: scaleFont(13) }, style, error ? styles.inputError : null]}
+      placeholder={placeholder}
+      value={value}
+      onChangeText={onChangeText}
+      onBlur={onBlur}
+      secureTextEntry={!visible}
+      autoCapitalize="none"
+      autoCorrect={false}
+      spellCheck={false}
+      textContentType="oneTimeCode"
+    />
   );
 }
 
@@ -61,6 +137,11 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
   const scaleFont = useScaleFont();
 
   const [step, setStep] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    scrollViewRef.current?.scrollTo({ y: 0, animated: false });
+  }, [step]);
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -74,20 +155,113 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
   const [useCurrentLocationChecked, setUseCurrentLocationChecked] = useState(false);
 
   const [phone, setPhone] = useState('');
+  const [country, setCountry] = useState<Country>(COUNTRIES[0]);
+  const [countryPickerVisible, setCountryPickerVisible] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [otpModalVisible, setOtpModalVisible] = useState(false);
   const [otpValue, setOtpValue] = useState('');
   const [otpError, setOtpError] = useState('');
+  const [otpSuccess, setOtpSuccess] = useState(false);
+  const successScale = useRef(new Animated.Value(0)).current;
+  const successOpacity = useRef(new Animated.Value(0)).current;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
   const isFirstStep = step === 0;
   const isLastStep = step === STEP_COUNT - 1;
-  const passwordsMismatch = confirmPassword.length > 0 && password !== confirmPassword;
+
+  const clearError = (field: string) => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const STEP_FIELDS: Record<number, string[]> = {
+    0: ['firstName', 'lastName', 'email', 'password', 'confirmPassword'],
+    1: ['streetAddress', 'suburb', 'city', 'postalCode'],
+    2: ['phone'],
+  };
+
+  const validateField = (field: string): string | undefined => {
+    switch (field) {
+      case 'firstName':
+        return firstName.trim() ? undefined : 'First name is required.';
+      case 'lastName':
+        return lastName.trim() ? undefined : 'Last name is required.';
+      case 'email':
+        if (!email.trim()) return 'Email address is required.';
+        if (!EMAIL_REGEX.test(email.trim())) return 'Enter a valid email address.';
+        return undefined;
+      case 'password':
+        return password ? undefined : 'Password is required.';
+      case 'confirmPassword':
+        if (!confirmPassword) return 'Please confirm your password.';
+        if (password !== confirmPassword) return 'Passwords do not match.';
+        return undefined;
+      case 'streetAddress':
+        return streetAddress.trim() ? undefined : 'Street address is required.';
+      case 'suburb':
+        return suburb.trim() ? undefined : 'Suburb is required.';
+      case 'city':
+        return city.trim() ? undefined : 'City is required.';
+      case 'postalCode':
+        return postalCode.trim() ? undefined : 'Postal code is required.';
+      case 'phone':
+        if (!phone.trim()) return 'Cellphone number is required.';
+        if (phone.length !== country.digits) {
+          return `Enter a valid ${country.digits}-digit ${country.name} number.`;
+        }
+        return undefined;
+      default:
+        return undefined;
+    }
+  };
+
+  const handleFieldBlur = (field: string) => {
+    const message = validateField(field);
+    setErrors((prev) => {
+      if (message) {
+        if (prev[field] === message) return prev;
+        return { ...prev, [field]: message };
+      }
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const validateStep = (stepToValidate: number): boolean => {
+    const fields = STEP_FIELDS[stepToValidate] ?? [];
+    const nextErrors: Record<string, string> = {};
+    fields.forEach((field) => {
+      const message = validateField(field);
+      if (message) nextErrors[field] = message;
+    });
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
 
   const handleToggleUseCurrentLocation = async () => {
     if (useCurrentLocationChecked) {
@@ -125,17 +299,29 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
   };
 
   const handlePhoneChange = (text: string) => {
-    setPhone(text);
+    const digitsOnly = text.replace(/\D/g, '').slice(0, country.digits);
+    setPhone(digitsOnly);
     setPhoneVerified(false);
     setOtpSent(false);
     setOtpModalVisible(false);
     setOtpValue('');
     setOtpError('');
+    clearError('phone');
+  };
+
+  const handleSelectCountry = (nextCountry: Country) => {
+    setCountry(nextCountry);
+    setCountryPickerVisible(false);
+    setPhone((current) => current.slice(0, nextCountry.digits));
+    setPhoneVerified(false);
+    setOtpSent(false);
+    clearError('phone');
   };
 
   const handleSendOtp = () => {
-    if (!phone.trim()) {
-      Alert.alert('Phone number needed', 'Enter your cellphone number first.');
+    const phoneError = validateField('phone');
+    if (phoneError) {
+      setErrors((prev) => ({ ...prev, phone: phoneError }));
       return;
     }
     setOtpValue('');
@@ -144,18 +330,68 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
     setOtpModalVisible(true);
   };
 
+  const submitRegistration = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const result = await registerUser({
+        firstName,
+        lastName,
+        email: email.trim(),
+        password,
+        streetAddress,
+        apartmentUnit: apartmentUnit.trim() || undefined,
+        suburb,
+        city,
+        postalCode,
+        phoneNumber: `${country.dialCode}${phone}`,
+      });
+      await saveToken(result.token);
+      onSubmit?.(result);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setStep(0);
+        setErrors((prev) => ({ ...prev, email: err.message }));
+      } else {
+        Alert.alert('Registration failed', 'Please check your connection and try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleConfirmOtp = () => {
     if (otpValue === MOCK_OTP) {
       setPhoneVerified(true);
-      setOtpModalVisible(false);
+      setOtpSuccess(true);
+      successScale.setValue(0);
+      successOpacity.setValue(0);
+      Animated.parallel([
+        Animated.timing(successOpacity, {
+          toValue: 1,
+          duration: 200,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.spring(successScale, {
+          toValue: 1,
+          friction: 5,
+          tension: 80,
+          useNativeDriver: true,
+        }),
+      ]).start();
+      setTimeout(() => {
+        setOtpModalVisible(false);
+        setOtpSuccess(false);
+        submitRegistration();
+      }, 950);
     } else {
       setOtpError('That code is wrong. Please try again.');
     }
   };
 
   const handleNext = () => {
-    if (step === 0 && passwordsMismatch) {
-      Alert.alert('Passwords do not match', 'Please make sure both password fields match.');
+    if (!validateStep(step)) {
       return;
     }
     if (isLastStep) {
@@ -163,7 +399,7 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
         Alert.alert('Verify your phone number', 'Please confirm your cellphone number before signing up.');
         return;
       }
-      onSubmit?.();
+      submitRegistration();
       return;
     }
     setStep((s) => s + 1);
@@ -174,7 +410,7 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
     <View style={styles.screen}>
       <KeyboardAvoidingView
         style={styles.flexFill}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
       >
         <CardDotPattern />
 
@@ -184,6 +420,7 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
         </View>
 
         <ScrollView
+          ref={scrollViewRef}
           style={styles.flexFill}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -204,18 +441,28 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                   scaleFont={scaleFont}
                   placeholder="Jane"
                   value={firstName}
-                  onChangeText={setFirstName}
+                  onChangeText={(text) => {
+                    setFirstName(text);
+                    clearError('firstName');
+                  }}
+                  onBlur={() => handleFieldBlur('firstName')}
                   autoCapitalize="words"
                   style={styles.rowField}
+                  error={errors.firstName}
                 />
                 <FormField
                   label="LAST NAME"
                   scaleFont={scaleFont}
                   placeholder="Doe"
                   value={lastName}
-                  onChangeText={setLastName}
+                  onChangeText={(text) => {
+                    setLastName(text);
+                    clearError('lastName');
+                  }}
+                  onBlur={() => handleFieldBlur('lastName')}
                   autoCapitalize="words"
                   style={styles.rowField}
+                  error={errors.lastName}
                 />
               </View>
 
@@ -224,9 +471,14 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                 scaleFont={scaleFont}
                 placeholder="jane.doe@email.com"
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  clearError('email');
+                }}
+                onBlur={() => handleFieldBlur('email')}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                error={errors.email}
               />
 
               <View style={styles.field}>
@@ -240,39 +492,39 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                     </Text>
                   </Pressable>
                 </View>
-                <TextInput
-                  placeholderTextColor={colors.muted}
-                  style={[styles.input, { fontSize: scaleFont(13), marginTop: 6 }]}
+                <MaskedPasswordInput
+                  style={{ marginTop: 6 }}
                   placeholder="••••••••"
                   value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!passwordVisible}
-                  autoCapitalize="none"
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    clearError('password');
+                  }}
+                  onBlur={() => handleFieldBlur('password')}
+                  visible={passwordVisible}
+                  scaleFont={scaleFont}
+                  error={errors.password}
                 />
+                <FieldError message={errors.password} scaleFont={scaleFont} />
               </View>
 
               <View style={styles.field}>
                 <Text style={[styles.fieldLabel, { fontSize: scaleFont(10) }]}>
                   CONFIRM PASSWORD
                 </Text>
-                <TextInput
-                  placeholderTextColor={colors.muted}
-                  style={[
-                    styles.input,
-                    { fontSize: scaleFont(13) },
-                    passwordsMismatch && styles.inputError,
-                  ]}
+                <MaskedPasswordInput
                   placeholder="••••••••"
                   value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  secureTextEntry={!passwordVisible}
-                  autoCapitalize="none"
+                  onChangeText={(text) => {
+                    setConfirmPassword(text);
+                    clearError('confirmPassword');
+                  }}
+                  onBlur={() => handleFieldBlur('confirmPassword')}
+                  visible={passwordVisible}
+                  scaleFont={scaleFont}
+                  error={errors.confirmPassword}
                 />
-                {passwordsMismatch && (
-                  <Text style={[styles.errorText, { fontSize: scaleFont(10) }]}>
-                    Passwords do not match.
-                  </Text>
-                )}
+                <FieldError message={errors.confirmPassword} scaleFont={scaleFont} />
               </View>
             </>
           )}
@@ -305,7 +557,12 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                 scaleFont={scaleFont}
                 placeholder="12 Main Road"
                 value={streetAddress}
-                onChangeText={setStreetAddress}
+                onChangeText={(text) => {
+                  setStreetAddress(text);
+                  clearError('streetAddress');
+                }}
+                onBlur={() => handleFieldBlur('streetAddress')}
+                error={errors.streetAddress}
               />
               <FormField
                 label="APARTMENT / UNIT / COMPLEX (OPTIONAL)"
@@ -320,16 +577,26 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                   scaleFont={scaleFont}
                   placeholder="Rondebosch"
                   value={suburb}
-                  onChangeText={setSuburb}
+                  onChangeText={(text) => {
+                    setSuburb(text);
+                    clearError('suburb');
+                  }}
+                  onBlur={() => handleFieldBlur('suburb')}
                   style={styles.rowField}
+                  error={errors.suburb}
                 />
                 <FormField
                   label="CITY"
                   scaleFont={scaleFont}
                   placeholder="Cape Town"
                   value={city}
-                  onChangeText={setCity}
+                  onChangeText={(text) => {
+                    setCity(text);
+                    clearError('city');
+                  }}
+                  onBlur={() => handleFieldBlur('city')}
                   style={styles.rowField}
+                  error={errors.city}
                 />
               </View>
               <FormField
@@ -337,8 +604,13 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                 scaleFont={scaleFont}
                 placeholder="7700"
                 value={postalCode}
-                onChangeText={setPostalCode}
+                onChangeText={(text) => {
+                  setPostalCode(text);
+                  clearError('postalCode');
+                }}
+                onBlur={() => handleFieldBlur('postalCode')}
                 keyboardType="number-pad"
+                error={errors.postalCode}
               />
             </>
           )}
@@ -353,14 +625,36 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                 <Text style={[styles.fieldLabel, { fontSize: scaleFont(10) }]}>
                   CELLPHONE NUMBER
                 </Text>
-                <TextInput
-                  placeholderTextColor={colors.muted}
-                  style={[styles.input, { fontSize: scaleFont(13) }]}
-                  placeholder="+27 71 234 5678"
-                  value={phone}
-                  onChangeText={handlePhoneChange}
-                  keyboardType="phone-pad"
-                />
+                <View style={styles.phoneRow}>
+                  <Pressable
+                    onPress={() => setCountryPickerVisible(true)}
+                    style={styles.countrySelect}
+                  >
+                    <Text style={{ fontSize: scaleFont(15) }}>{country.flag}</Text>
+                    <Text style={[styles.countrySelectText, { fontSize: scaleFont(13) }]}>
+                      {country.dialCode}
+                    </Text>
+                    <Text style={styles.countrySelectChevron}>▾</Text>
+                  </Pressable>
+                  <TextInput
+                    placeholderTextColor={colors.muted}
+                    style={[
+                      styles.input,
+                      styles.phoneInput,
+                      { fontSize: scaleFont(13) },
+                      errors.phone ? styles.inputError : null,
+                    ]}
+                    placeholder="71 234 5678"
+                    value={phone}
+                    onChangeText={handlePhoneChange}
+                    onBlur={() => handleFieldBlur('phone')}
+                    keyboardType="phone-pad"
+                    maxLength={country.digits}
+                    autoCorrect={false}
+                    spellCheck={false}
+                  />
+                </View>
+                <FieldError message={errors.phone} scaleFont={scaleFont} />
                 <Pressable onPress={handleSendOtp} disabled={phoneVerified} style={styles.otpSendButton}>
                   <LinearGradient
                     colors={colors.wordmarkGradient}
@@ -370,7 +664,7 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                     style={styles.otpSendButtonGradient}
                   >
                     <Text style={[styles.nextButtonText, { fontSize: scaleFont(11) }]}>
-                      {phoneVerified ? 'VERIFIED ✓' : otpSent ? 'RESEND OTP' : 'SEND OTP'}
+                      {phoneVerified ? 'VERIFIED' : otpSent ? 'RESEND OTP' : 'SEND OTP'}
                     </Text>
                   </LinearGradient>
                 </Pressable>
@@ -380,14 +674,19 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
 
         </ScrollView>
 
-        <View style={[styles.footerWrap, { paddingBottom: insets.bottom + 20 }]}>
+        <View
+          style={[
+            styles.footerWrap,
+            { paddingBottom: keyboardVisible ? 12 : insets.bottom + 20 },
+          ]}
+        >
           <View style={styles.navRow}>
             {!isFirstStep && (
               <Pressable onPress={handleBack} style={styles.backButton}>
                 <Text style={[styles.backButtonText, { fontSize: scaleFont(10.5) }]}>BACK</Text>
               </Pressable>
             )}
-            <Pressable onPress={handleNext} style={styles.nextButton}>
+            <Pressable onPress={handleNext} style={styles.nextButton} disabled={isSubmitting}>
               <LinearGradient
                 colors={colors.wordmarkGradient}
                 locations={colors.wordmarkGradientLocations}
@@ -395,9 +694,13 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
                 end={{ x: 1, y: 0 }}
                 style={styles.nextButtonGradient}
               >
-                <Text style={[styles.nextButtonText, { fontSize: scaleFont(11) }]}>
-                  {isLastStep ? 'SIGN UP' : 'NEXT'}
-                </Text>
+                {isSubmitting ? (
+                  <ActivityIndicator size="small" color="#08090b" />
+                ) : (
+                  <Text style={[styles.nextButtonText, { fontSize: scaleFont(11) }]}>
+                    {isLastStep ? 'SIGN UP' : 'NEXT'}
+                  </Text>
+                )}
               </LinearGradient>
             </Pressable>
           </View>
@@ -421,44 +724,110 @@ export function SignUpScreen({ onSubmit, onLoginPress }: Props) {
       >
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
-            <Text style={[styles.modalTitle, { fontSize: scaleFont(13) }]}>Verify your number</Text>
-            <Text style={[styles.otpHint, { fontSize: scaleFont(10) }]}>
-              Enter the 4-digit code sent to {phone || 'your phone'} (use {MOCK_OTP} for testing)
-            </Text>
-            <TextInput
-              placeholderTextColor={colors.muted}
-              style={[styles.modalInput, { fontSize: scaleFont(18) }]}
-              placeholder="0000"
-              value={otpValue}
-              onChangeText={(text) => {
-                setOtpValue(text);
-                setOtpError('');
-              }}
-              keyboardType="number-pad"
-              maxLength={4}
-              autoFocus
-            />
-            {otpError ? (
-              <Text style={[styles.errorText, { fontSize: scaleFont(10), textAlign: 'center' }]}>
-                {otpError}
-              </Text>
-            ) : null}
-            <Pressable onPress={handleConfirmOtp} style={styles.modalConfirmButton}>
-              <LinearGradient
-                colors={colors.wordmarkGradient}
-                locations={colors.wordmarkGradientLocations}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.modalConfirmGradient}
-              >
-                <Text style={[styles.nextButtonText, { fontSize: scaleFont(11) }]}>CONFIRM</Text>
-              </LinearGradient>
-            </Pressable>
-            <Pressable onPress={() => setOtpModalVisible(false)} hitSlop={8} style={styles.modalCancel}>
-              <Text style={[styles.modalCancelText, { fontSize: scaleFont(10.5) }]}>Cancel</Text>
-            </Pressable>
+            {otpSuccess ? (
+              <View style={styles.otpSuccessWrap}>
+                <Animated.View
+                  style={[
+                    styles.otpSuccessBadge,
+                    {
+                      opacity: successOpacity,
+                      transform: [{ scale: successScale }],
+                    },
+                  ]}
+                >
+                  <LinearGradient
+                    colors={colors.wordmarkGradient}
+                    locations={colors.wordmarkGradientLocations}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.otpSuccessBadgeGradient}
+                  >
+                    <Text style={styles.otpSuccessTick}>✓</Text>
+                  </LinearGradient>
+                </Animated.View>
+                <Animated.Text
+                  style={[
+                    styles.modalTitle,
+                    { fontSize: scaleFont(13), marginTop: 18, opacity: successOpacity },
+                  ]}
+                >
+                  Number verified
+                </Animated.Text>
+              </View>
+            ) : (
+              <>
+                <Text style={[styles.modalTitle, { fontSize: scaleFont(13) }]}>Verify your number</Text>
+                <Text style={[styles.otpHint, { fontSize: scaleFont(10) }]}>
+                  Enter the 4-digit code sent to {phone ? `${country.dialCode} ${phone}` : 'your phone'} (use {MOCK_OTP} for testing)
+                </Text>
+                <TextInput
+                  placeholderTextColor={colors.muted}
+                  style={[styles.modalInput, { fontSize: scaleFont(18) }]}
+                  placeholder="0000"
+                  value={otpValue}
+                  onChangeText={(text) => {
+                    setOtpValue(text);
+                    setOtpError('');
+                  }}
+                  keyboardType="number-pad"
+                  maxLength={4}
+                  autoFocus
+                  autoCorrect={false}
+                  spellCheck={false}
+                />
+                {otpError ? (
+                  <Text style={[styles.errorText, { fontSize: scaleFont(10), textAlign: 'center' }]}>
+                    {otpError}
+                  </Text>
+                ) : null}
+                <Pressable onPress={handleConfirmOtp} style={styles.modalConfirmButton}>
+                  <LinearGradient
+                    colors={colors.wordmarkGradient}
+                    locations={colors.wordmarkGradientLocations}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.modalConfirmGradient}
+                  >
+                    <Text style={[styles.nextButtonText, { fontSize: scaleFont(11) }]}>CONFIRM</Text>
+                  </LinearGradient>
+                </Pressable>
+                <Pressable onPress={() => setOtpModalVisible(false)} hitSlop={8} style={styles.modalCancel}>
+                  <Text style={[styles.modalCancelText, { fontSize: scaleFont(10.5) }]}>Cancel</Text>
+                </Pressable>
+              </>
+            )}
           </View>
         </View>
+      </Modal>
+
+      <Modal
+        visible={countryPickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCountryPickerVisible(false)}
+      >
+        <Pressable style={styles.modalBackdrop} onPress={() => setCountryPickerVisible(false)}>
+          <View style={styles.countryModalCard}>
+            <Text style={[styles.modalTitle, { fontSize: scaleFont(13) }]}>Select country</Text>
+            <ScrollView style={styles.countryList}>
+              {COUNTRIES.map((item) => (
+                <Pressable
+                  key={item.code}
+                  onPress={() => handleSelectCountry(item)}
+                  style={styles.countryOption}
+                >
+                  <Text style={{ fontSize: scaleFont(16) }}>{item.flag}</Text>
+                  <Text style={[styles.countryOptionText, { fontSize: scaleFont(12.5) }]}>
+                    {item.name}
+                  </Text>
+                  <Text style={[styles.countryOptionDialCode, { fontSize: scaleFont(12.5) }]}>
+                    {item.dialCode}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+        </Pressable>
       </Modal>
     </View>
   );
@@ -561,10 +930,91 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: colors.error,
   },
+  phoneRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  countrySelect: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(232, 201, 160, 0.2)',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+  },
+  countrySelectText: {
+    fontFamily: typography.medium,
+    color: colors.text,
+  },
+  countrySelectChevron: {
+    color: colors.muted,
+    fontSize: 10,
+    marginLeft: 1,
+  },
+  phoneInput: {
+    flex: 1,
+  },
+  countryModalCard: {
+    width: '100%',
+    maxHeight: '70%',
+    backgroundColor: colors.bgTop,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(232, 201, 160, 0.25)',
+    paddingHorizontal: 18,
+    paddingVertical: 22,
+  },
+  countryList: {
+    marginTop: 8,
+  },
+  countryOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(232, 201, 160, 0.1)',
+  },
+  countryOptionText: {
+    flex: 1,
+    fontFamily: typography.regular,
+    color: colors.text,
+  },
+  countryOptionDialCode: {
+    fontFamily: typography.medium,
+    color: colors.muted,
+  },
   errorText: {
     fontFamily: typography.medium,
     color: colors.error,
     marginTop: 6,
+  },
+  fieldErrorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    gap: 5,
+  },
+  fieldErrorIcon: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: 'rgba(224, 133, 126, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fieldErrorIconText: {
+    color: colors.error,
+    fontSize: 9,
+    fontFamily: typography.bold,
+    lineHeight: 10,
+  },
+  fieldErrorText: {
+    fontFamily: typography.medium,
+    color: colors.error,
+    flexShrink: 1,
   },
   checkboxRow: {
     flexDirection: 'row',
@@ -676,6 +1126,27 @@ const styles = StyleSheet.create({
     color: colors.text,
     textAlign: 'center',
     marginBottom: 8,
+  },
+  otpSuccessWrap: {
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  otpSuccessBadge: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    overflow: 'hidden',
+  },
+  otpSuccessBadgeGradient: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  otpSuccessTick: {
+    color: colors.bgTop,
+    fontSize: 28,
+    fontFamily: typography.bold,
   },
   modalInput: {
     fontFamily: typography.bold,
