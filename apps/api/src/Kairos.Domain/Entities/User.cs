@@ -17,4 +17,5 @@ public class User
     public bool IsActive { get; set; } = true;
 
     public ICollection<Address> Addresses { get; set; } = new List<Address>();
+    public ICollection<PasswordHistoryEntry> PasswordHistory { get; set; } = new List<PasswordHistoryEntry>();
 }

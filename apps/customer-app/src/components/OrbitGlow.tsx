@@ -7,6 +7,7 @@ import { colors } from '../theme/colors';
 
 type Props = {
   size?: number;
+  centerContent?: React.ReactNode;
 };
 
 type ArcConfig = {
@@ -163,7 +164,7 @@ function OrbitArc({
 // bands, set at different concentric radii, each independently rotating and
 // fading in and out on its own staggered rhythm, two dots orbiting together
 // near the outer edge, and a small gradient glow breathing at the center.
-export function OrbitGlow({ size = 90 }: Props) {
+export function OrbitGlow({ size = 90, centerContent }: Props) {
   const breathe = useRef(new Animated.Value(0)).current;
   const rotation = useRef(new Animated.Value(0)).current;
 
@@ -211,25 +212,29 @@ export function OrbitGlow({ size = 90 }: Props) {
 
   return (
     <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-      <Animated.View
-        style={{
-          position: 'absolute',
-          width: glowSize,
-          height: glowSize,
-          borderRadius: glowSize / 2,
-          opacity: glowOpacity,
-          transform: [{ scale: glowScale }],
-          overflow: 'hidden',
-        }}
-      >
-        <LinearGradient
-          colors={colors.taglineGradient}
-          locations={colors.taglineGradientLocations}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{ width: '100%', height: '100%' }}
-        />
-      </Animated.View>
+      {centerContent ? (
+        centerContent
+      ) : (
+        <Animated.View
+          style={{
+            position: 'absolute',
+            width: glowSize,
+            height: glowSize,
+            borderRadius: glowSize / 2,
+            opacity: glowOpacity,
+            transform: [{ scale: glowScale }],
+            overflow: 'hidden',
+          }}
+        >
+          <LinearGradient
+            colors={colors.taglineGradient}
+            locations={colors.taglineGradientLocations}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ width: '100%', height: '100%' }}
+          />
+        </Animated.View>
+      )}
 
       {ARCS.map((config) => (
         <OrbitArc key={config.key} size={size} ringRadius={ringRadius} config={config} />

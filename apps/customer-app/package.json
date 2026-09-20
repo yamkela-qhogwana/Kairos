@@ -13,10 +13,12 @@
     "expo-secure-store": "~15.0.8",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
+    "libphonenumber-js": "^1.13.13",
     "react": "19.1.0",
     "react-native": "0.81.5",
     "react-native-safe-area-context": "~5.6.0",
-    "react-native-svg": "15.12.1"
+    "react-native-svg": "15.12.1",
+    "world-countries": "^5.1.0"
   },
   "devDependencies": {
     "@types/react": "~19.1.10",

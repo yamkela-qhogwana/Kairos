@@ -22,6 +22,11 @@ public class UserRegistrationService(KairosDbContext dbContext, ITokenService to
             throw new EmailAlreadyRegisteredException(normalizedEmail);
         }
 
+        if (PasswordPolicy.IsWeak(request.Password, normalizedEmail, request.FirstName.Trim(), request.LastName.Trim()))
+        {
+            throw new WeakPasswordException();
+        }
+
         var user = new User
         {
             FirstName = request.FirstName.Trim(),

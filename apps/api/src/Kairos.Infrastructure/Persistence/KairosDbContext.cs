@@ -8,6 +8,7 @@ public class KairosDbContext(DbContextOptions<KairosDbContext> options) : DbCont
     public DbSet<User> Users => Set<User>();
     public DbSet<Address> Addresses => Set<Address>();
     public DbSet<AddressType> AddressTypes => Set<AddressType>();
+    public DbSet<PasswordHistoryEntry> PasswordHistoryEntries => Set<PasswordHistoryEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,6 +34,16 @@ public class KairosDbContext(DbContextOptions<KairosDbContext> options) : DbCont
             // A user can't have two addresses claiming the same slot
             // (e.g. two "Primary" addresses).
             entity.HasIndex(a => new { a.UserId, a.AddressTypeId }).IsUnique();
+        });
+
+        modelBuilder.Entity<PasswordHistoryEntry>(entity =>
+        {
+            entity.HasOne(p => p.User)
+                .WithMany(u => u.PasswordHistory)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(p => new { p.UserId, p.CreatedAt });
         });
 
         modelBuilder.Entity<AddressType>().HasData(

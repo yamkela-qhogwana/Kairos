@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
+  Keyboard,
   KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,15 +16,20 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { CardDotPattern } from '../components/CardDotPattern';
 import { KairosWordmark } from '../components/KairosWordmark';
 import { OrbitGlow } from '../components/OrbitGlow';
+import { FieldError } from '../components/FieldError';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { useScaleFont } from '../theme/responsive';
+import { loginUser, ApiError, AuthResponse } from '../api/auth';
+import { saveToken } from '../api/tokenStorage';
 
 type Props = {
-  onSubmit?: () => void;
+  onSubmit?: (result: AuthResponse) => void;
   onSignUpPress?: () => void;
   onForgotPasswordPress?: () => void;
 };
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function LoginScreen({ onSubmit, onSignUpPress, onForgotPasswordPress }: Props) {
   const insets = useSafeAreaInsets();
@@ -31,12 +38,99 @@ export function LoginScreen({ onSubmit, onSignUpPress, onForgotPasswordPress }: 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const clearError = (field: string) => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const validateField = (field: string): string | undefined => {
+    switch (field) {
+      case 'email':
+        if (!email.trim()) return 'Email address is required.';
+        if (!EMAIL_REGEX.test(email.trim())) return 'Enter a valid email address.';
+        return undefined;
+      case 'password':
+        return password ? undefined : 'Password is required.';
+      default:
+        return undefined;
+    }
+  };
+
+  const handleFieldBlur = (field: string) => {
+    const message = validateField(field);
+    setErrors((prev) => {
+      if (message) {
+        if (prev[field] === message) return prev;
+        return { ...prev, [field]: message };
+      }
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  // Autofill (and fast IME commits on Android) can land the field's value a
+  // beat after the blur event fires, so a same-tick "is it filled" check can
+  // see stale/empty state. Defer one tick, and read the check through a ref
+  // that's refreshed every render so we always validate against the latest
+  // state regardless of exactly when the deferred callback runs.
+  const handleFieldBlurRef = useRef(handleFieldBlur);
+  handleFieldBlurRef.current = handleFieldBlur;
+
+  const deferredFieldBlur = (field: string) => {
+    setTimeout(() => handleFieldBlurRef.current(field), 80);
+  };
+
+  const handleSubmit = async () => {
+    const emailError = validateField('email');
+    const passwordError = validateField('password');
+    const nextErrors: Record<string, string> = {};
+    if (emailError) nextErrors.email = emailError;
+    if (passwordError) nextErrors.password = passwordError;
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      const result = await loginUser({ email: email.trim(), password });
+      await saveToken(result.token);
+      onSubmit?.(result);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        setErrors({ password: err.message });
+      } else {
+        Alert.alert('Login failed', 'Please check your connection and try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <View style={styles.screen}>
       <KeyboardAvoidingView
         style={styles.flexFill}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
       >
         <CardDotPattern />
 
@@ -63,13 +157,20 @@ export function LoginScreen({ onSubmit, onSignUpPress, onForgotPasswordPress }: 
           <View style={styles.field}>
             <TextInput
               placeholderTextColor={colors.muted}
-              style={[styles.input, { fontSize: scaleFont(13) }]}
+              style={[styles.input, { fontSize: scaleFont(13) }, errors.email ? styles.inputError : null]}
               placeholder="jane.doe@email.com"
               value={email}
-              onChangeText={setEmail}
+              onChangeText={(text) => {
+                setEmail(text);
+                clearError('email');
+              }}
+              onBlur={() => deferredFieldBlur('email')}
               keyboardType="email-address"
               autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
             />
+            <FieldError message={errors.email} scaleFont={scaleFont} />
           </View>
 
           <View style={styles.field}>
@@ -85,13 +186,25 @@ export function LoginScreen({ onSubmit, onSignUpPress, onForgotPasswordPress }: 
             </View>
             <TextInput
               placeholderTextColor={colors.muted}
-              style={[styles.input, { fontSize: scaleFont(13), marginTop: 6 }]}
+              style={[
+                styles.input,
+                { fontSize: scaleFont(13), marginTop: 6 },
+                errors.password ? styles.inputError : null,
+              ]}
               placeholder="••••••••"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(text) => {
+                setPassword(text);
+                clearError('password');
+              }}
+              onBlur={() => deferredFieldBlur('password')}
               secureTextEntry={!passwordVisible}
               autoCapitalize="none"
+              autoCorrect={false}
+              spellCheck={false}
+              textContentType="oneTimeCode"
             />
+            <FieldError message={errors.password} scaleFont={scaleFont} />
             <Pressable onPress={onForgotPasswordPress} hitSlop={8} style={styles.forgotPasswordButton}>
               <Text style={[styles.forgotPasswordText, { fontSize: scaleFont(10.5) }]}>
                 Forgot password?
@@ -100,8 +213,13 @@ export function LoginScreen({ onSubmit, onSignUpPress, onForgotPasswordPress }: 
           </View>
         </ScrollView>
 
-        <View style={[styles.footerWrap, { paddingBottom: insets.bottom + 20 }]}>
-          <Pressable onPress={onSubmit} style={styles.loginButton}>
+        <View
+          style={[
+            styles.footerWrap,
+            { paddingBottom: keyboardVisible ? 12 : insets.bottom + 20 },
+          ]}
+        >
+          <Pressable onPress={handleSubmit} style={styles.loginButton} disabled={isSubmitting}>
             <LinearGradient
               colors={colors.wordmarkGradient}
               locations={colors.wordmarkGradientLocations}
@@ -109,7 +227,11 @@ export function LoginScreen({ onSubmit, onSignUpPress, onForgotPasswordPress }: 
               end={{ x: 1, y: 0 }}
               style={styles.loginButtonGradient}
             >
-              <Text style={[styles.loginButtonText, { fontSize: scaleFont(11) }]}>LOG IN</Text>
+              {isSubmitting ? (
+                <ActivityIndicator size="small" color="#08090b" />
+              ) : (
+                <Text style={[styles.loginButtonText, { fontSize: scaleFont(11) }]}>LOG IN</Text>
+              )}
             </LinearGradient>
           </Pressable>
 
@@ -214,6 +336,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 14,
     paddingVertical: 12,
+  },
+  inputError: {
+    borderColor: colors.error,
   },
   loginButton: {
     marginTop: 12,

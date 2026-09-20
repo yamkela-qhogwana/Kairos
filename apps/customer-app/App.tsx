@@ -62,7 +62,7 @@ export default function App() {
         ) : currentUser ? (
           <View style={styles.homePlaceholder}>
             <Text style={styles.homeTitle}>Welcome, {currentUser.firstName}!</Text>
-            <Text style={styles.homeSubtitle}>Your account was created successfully.</Text>
+            <Text style={styles.homeSubtitle}>You're signed in.</Text>
           </View>
         ) : authScreen === 'signup' ? (
           <SignUpScreen
@@ -73,6 +73,7 @@ export default function App() {
           <LoginScreen
             onSignUpPress={() => setAuthScreen('signup')}
             onForgotPasswordPress={() => setAuthScreen('forgotPassword')}
+            onSubmit={(result) => setCurrentUser(result)}
           />
         ) : (
           <ForgotPasswordScreen
