@@ -4,6 +4,7 @@ using Kairos.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,9 +13,11 @@ using NetTopologySuite.Geometries;
 namespace Kairos.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(KairosDbContext))]
-    partial class KairosDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260921005045_AddCategories")]
+    partial class AddCategories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,6 +240,10 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                     b.Property<int?>("DiscountPercentage")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -276,6 +283,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 10,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 129.99m,
                             Rating = 3.6400000000000001,
@@ -289,6 +297,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 16,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/corset-leather-with-skirt/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 89.99m,
                             Rating = 3.0499999999999998,
@@ -302,6 +311,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/corset-with-black-skirt/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 79.99m,
                             Rating = 4.5199999999999996,
@@ -315,6 +325,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/dress-pea/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 49.99m,
                             Rating = 4.8799999999999999,
@@ -328,6 +339,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 19,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/marni-red-&-black-suit/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 179.99m,
                             Rating = 4.4800000000000004,
@@ -341,6 +353,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 12,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/blue-frock/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 29.99m,
                             Rating = 4.1699999999999999,
@@ -354,6 +367,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 19,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/girl-summer-dress/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 19.99m,
                             Rating = 4.7699999999999996,
@@ -367,6 +381,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 14,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/gray-dress/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 34.99m,
                             Rating = 2.7200000000000002,
@@ -380,6 +395,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 13,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/short-frock/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 24.99m,
                             Rating = 3.23,
@@ -393,6 +409,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 13,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/tartan-dress/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 39.99m,
                             Rating = 4.0499999999999998,
@@ -406,6 +423,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)3,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 3,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/black-&-brown-slipper/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 19.99m,
                             Rating = 2.5299999999999998,
@@ -419,6 +437,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)3,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 3,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/calvin-klein-heel-shoes/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 79.99m,
                             Rating = 4.9199999999999999,
@@ -432,6 +451,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)3,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 14,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/golden-shoes-woman/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 49.99m,
                             Rating = 3.2599999999999998,
@@ -445,6 +465,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)3,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 14,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/pampi-shoes/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 29.99m,
                             Rating = 3.0499999999999998,
@@ -458,6 +479,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)3,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/red-shoes/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 34.99m,
                             Rating = 3.25,
@@ -471,6 +493,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)4,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/blue-women's-handbag/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 49.99m,
                             Rating = 2.9199999999999999,
@@ -484,6 +507,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)4,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 4,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/heshe-women's-leather-bag/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 129.99m,
                             Rating = 4.9199999999999999,
@@ -497,6 +521,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)4,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 14,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/prada-women-bag/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 599.99m,
                             Rating = 2.71,
@@ -510,6 +535,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)4,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/white-faux-leather-backpack/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 39.99m,
                             Rating = 3.3599999999999999,
@@ -523,6 +549,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)4,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 12,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/women-handbag-black/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 59.99m,
                             Rating = 2.8900000000000001,
@@ -536,6 +563,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)5,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-jewellery/green-crystal-earring/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 29.99m,
                             Rating = 3.96,
@@ -549,6 +577,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)5,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-jewellery/green-oval-earring/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 24.99m,
                             Rating = 3.5699999999999998,
@@ -562,6 +591,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)5,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 1,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-jewellery/tropical-earring/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 19.99m,
                             Rating = 4.4000000000000004,
@@ -575,6 +605,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)6,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 5,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/black-sun-glasses/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 29.99m,
                             Rating = 4.4100000000000001,
@@ -588,6 +619,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)6,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 5,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/classic-sun-glasses/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 24.99m,
                             Rating = 3.8599999999999999,
@@ -601,6 +633,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)6,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 1,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/green-and-black-glasses/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 34.99m,
                             Rating = 4.5499999999999998,
@@ -614,6 +647,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)6,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 11,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/party-glasses/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 19.99m,
                             Rating = 2.79,
@@ -627,6 +661,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)6,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 2,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/sunglasses/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 22.99m,
                             Rating = 3.02,
@@ -640,6 +675,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)7,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/blue-&-black-check-shirt/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 29.99m,
                             Rating = 3.6400000000000001,
@@ -653,6 +689,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)7,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 1,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/gigabyte-aorus-men-tshirt/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 24.99m,
                             Rating = 3.1800000000000002,
@@ -666,6 +703,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)7,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 20,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/man-plaid-shirt/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 34.99m,
                             Rating = 3.46,
@@ -679,6 +717,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)7,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 7,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/man-short-sleeve-shirt/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 19.99m,
                             Rating = 2.8999999999999999,
@@ -692,6 +731,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)7,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 11,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/men-check-shirt/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 27.99m,
                             Rating = 2.7200000000000002,
@@ -705,6 +745,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)8,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 4,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/nike-air-jordan-1-red-and-black/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 149.99m,
                             Rating = 4.7699999999999996,
@@ -718,6 +759,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)8,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/nike-baseball-cleats/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 79.99m,
                             Rating = 3.8799999999999999,
@@ -731,6 +773,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)8,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 4,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/puma-future-rider-trainers/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 89.99m,
                             Rating = 4.9000000000000004,
@@ -744,6 +787,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)8,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 5,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/sports-sneakers-off-white-&-red/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 119.99m,
                             Rating = 4.7699999999999996,
@@ -756,6 +800,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 38L,
                             CategoryId = (byte)8,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/sports-sneakers-off-white-red/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 109.99m,
                             Rating = 4.6900000000000004,
@@ -768,6 +813,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 6,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/brown-leather-belt-watch/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 89.99m,
                             Rating = 4.1900000000000004,
@@ -781,6 +827,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 17,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/longines-master-collection/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 1499.99m,
                             Rating = 3.8700000000000001,
@@ -794,6 +841,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 9,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-cellini-date-black-dial/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 8999.99m,
                             Rating = 4.9699999999999998,
@@ -807,6 +855,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-cellini-moonphase/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 12999.99m,
                             Rating = 2.5800000000000001,
@@ -820,6 +869,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 4,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-datejust/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 10999.99m,
                             Rating = 3.6600000000000001,
@@ -833,382 +883,13 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 5,
+                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-submariner-watch/thumbnail.webp",
                             IsActive = true,
                             OriginalPrice = 13999.99m,
                             Rating = 2.6899999999999999,
                             SalePrice = 13299.99m,
                             StoreId = 1L,
                             Title = "Rolex Submariner Watch"
-                        });
-                });
-
-            modelBuilder.Entity("Kairos.Domain.Entities.ProductImage", b =>
-                {
-                    b.Property<long>("ProductImageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductImageId"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("ProductId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProductImageId");
-
-                    b.HasIndex("ProductId", "SortOrder");
-
-                    b.ToTable("ProductImages");
-
-                    b.HasData(
-                        new
-                        {
-                            ProductImageId = 1L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/thumbnail.webp",
-                            ProductId = 1L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 2L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/1.webp",
-                            ProductId = 1L,
-                            SortOrder = 1
-                        },
-                        new
-                        {
-                            ProductImageId = 3L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/corset-leather-with-skirt/thumbnail.webp",
-                            ProductId = 2L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 4L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/corset-with-black-skirt/thumbnail.webp",
-                            ProductId = 3L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 5L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/dress-pea/thumbnail.webp",
-                            ProductId = 4L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 6L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/marni-red-&-black-suit/thumbnail.webp",
-                            ProductId = 5L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 7L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/blue-frock/thumbnail.webp",
-                            ProductId = 6L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 8L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/girl-summer-dress/thumbnail.webp",
-                            ProductId = 7L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 9L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/gray-dress/thumbnail.webp",
-                            ProductId = 8L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 10L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/short-frock/thumbnail.webp",
-                            ProductId = 9L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 11L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/tops/tartan-dress/thumbnail.webp",
-                            ProductId = 10L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 12L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/black-&-brown-slipper/thumbnail.webp",
-                            ProductId = 11L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 13L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/calvin-klein-heel-shoes/thumbnail.webp",
-                            ProductId = 12L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 14L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/golden-shoes-woman/thumbnail.webp",
-                            ProductId = 13L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 15L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/pampi-shoes/thumbnail.webp",
-                            ProductId = 14L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 16L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-shoes/red-shoes/thumbnail.webp",
-                            ProductId = 15L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 17L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/blue-women's-handbag/thumbnail.webp",
-                            ProductId = 16L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 18L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/heshe-women's-leather-bag/thumbnail.webp",
-                            ProductId = 17L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 19L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/prada-women-bag/thumbnail.webp",
-                            ProductId = 18L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 20L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/prada-women-bag/1.webp",
-                            ProductId = 18L,
-                            SortOrder = 1
-                        },
-                        new
-                        {
-                            ProductImageId = 21L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/white-faux-leather-backpack/thumbnail.webp",
-                            ProductId = 19L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 22L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-bags/women-handbag-black/thumbnail.webp",
-                            ProductId = 20L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 23L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-jewellery/green-crystal-earring/thumbnail.webp",
-                            ProductId = 21L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 24L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-jewellery/green-oval-earring/thumbnail.webp",
-                            ProductId = 22L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 25L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/womens-jewellery/tropical-earring/thumbnail.webp",
-                            ProductId = 23L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 26L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/black-sun-glasses/thumbnail.webp",
-                            ProductId = 24L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 27L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/black-sun-glasses/1.webp",
-                            ProductId = 24L,
-                            SortOrder = 1
-                        },
-                        new
-                        {
-                            ProductImageId = 28L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/classic-sun-glasses/thumbnail.webp",
-                            ProductId = 25L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 29L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/green-and-black-glasses/thumbnail.webp",
-                            ProductId = 26L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 30L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/party-glasses/thumbnail.webp",
-                            ProductId = 27L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 31L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/sunglasses/sunglasses/thumbnail.webp",
-                            ProductId = 28L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 32L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/blue-&-black-check-shirt/thumbnail.webp",
-                            ProductId = 29L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 33L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/gigabyte-aorus-men-tshirt/thumbnail.webp",
-                            ProductId = 30L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 34L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/man-plaid-shirt/thumbnail.webp",
-                            ProductId = 31L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 35L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/man-short-sleeve-shirt/thumbnail.webp",
-                            ProductId = 32L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 36L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shirts/men-check-shirt/thumbnail.webp",
-                            ProductId = 33L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 37L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/nike-air-jordan-1-red-and-black/thumbnail.webp",
-                            ProductId = 34L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 38L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/nike-air-jordan-1-red-and-black/1.webp",
-                            ProductId = 34L,
-                            SortOrder = 1
-                        },
-                        new
-                        {
-                            ProductImageId = 39L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/nike-baseball-cleats/thumbnail.webp",
-                            ProductId = 35L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 40L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/puma-future-rider-trainers/thumbnail.webp",
-                            ProductId = 36L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 41L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/sports-sneakers-off-white-&-red/thumbnail.webp",
-                            ProductId = 37L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 42L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-shoes/sports-sneakers-off-white-red/thumbnail.webp",
-                            ProductId = 38L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 43L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/brown-leather-belt-watch/thumbnail.webp",
-                            ProductId = 39L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 44L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/longines-master-collection/thumbnail.webp",
-                            ProductId = 40L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 45L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-cellini-date-black-dial/thumbnail.webp",
-                            ProductId = 41L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 46L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-cellini-date-black-dial/1.webp",
-                            ProductId = 41L,
-                            SortOrder = 1
-                        },
-                        new
-                        {
-                            ProductImageId = 47L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-cellini-moonphase/thumbnail.webp",
-                            ProductId = 42L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 48L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-datejust/thumbnail.webp",
-                            ProductId = 43L,
-                            SortOrder = 0
-                        },
-                        new
-                        {
-                            ProductImageId = 49L,
-                            ImageUrl = "https://cdn.dummyjson.com/product-images/mens-watches/rolex-submariner-watch/thumbnail.webp",
-                            ProductId = 44L,
-                            SortOrder = 0
                         });
                 });
 
@@ -1389,17 +1070,6 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                     b.Navigation("Store");
                 });
 
-            modelBuilder.Entity("Kairos.Domain.Entities.ProductImage", b =>
-                {
-                    b.HasOne("Kairos.Domain.Entities.Product", "Product")
-                        .WithMany("Images")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("Kairos.Domain.Entities.Sale", b =>
                 {
                     b.HasOne("Kairos.Domain.Entities.Store", "Store")
@@ -1429,11 +1099,6 @@ namespace Kairos.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Kairos.Domain.Entities.Category", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("Kairos.Domain.Entities.Product", b =>
-                {
-                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("Kairos.Domain.Entities.Sale", b =>

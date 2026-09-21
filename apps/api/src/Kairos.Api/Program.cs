@@ -1,8 +1,10 @@
 using System.Text;
 using Kairos.Api.Auth;
 using Kairos.Application.Auth;
+using Kairos.Application.Products;
 using Kairos.Infrastructure.Auth;
 using Kairos.Infrastructure.Persistence;
+using Kairos.Infrastructure.Products;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -24,6 +26,8 @@ builder.Services.AddScoped<IUserRegistrationService, UserRegistrationService>();
 builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IUserLookupService, UserLookupService>();
+builder.Services.AddScoped<IProductQueryService, ProductQueryService>();
+builder.Services.AddScoped<ICategoryQueryService, CategoryQueryService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtSecret = jwtSection["Secret"]
