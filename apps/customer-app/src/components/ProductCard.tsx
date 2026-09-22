@@ -118,14 +118,14 @@ export function ProductCard({ product, scaleFont, width }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 18,
+    marginBottom: 8,
   },
   imageWrap: {
-    aspectRatio: 0.85,
-    borderRadius: 10,
+    aspectRatio: 0.75,
+    borderRadius: 0,
     overflow: 'hidden',
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   image: {
     width: '100%',
@@ -135,14 +135,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     left: 8,
-    backgroundColor: colors.error,
-    borderRadius: 4,
+    backgroundColor: colors.dotGold,
+    borderRadius: 0,
     paddingHorizontal: 6,
     paddingVertical: 3,
   },
   saleBadgeText: {
     fontFamily: typography.bold,
-    color: '#fff',
+    color: '#08090b',
   },
   likeButton: {
     position: 'absolute',

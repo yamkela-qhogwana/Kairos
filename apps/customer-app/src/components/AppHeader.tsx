@@ -7,7 +7,7 @@ import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { useScaleFont } from '../theme/responsive';
 
-const SCREEN_PADDING = 20;
+const SCREEN_PADDING = 16;
 
 type Props = {
   searchQuery: string;

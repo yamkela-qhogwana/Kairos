@@ -19,10 +19,10 @@ const TABS: {
   icon: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
   iconActive: React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 }[] = [
-  { key: 'home', label: 'Home', icon: 'home-outline', iconActive: 'home' },
-  { key: 'trending', label: 'Trending', icon: 'trending-up', iconActive: 'trending-up' },
-  { key: 'forYou', label: 'For You', icon: 'thumb-up-outline', iconActive: 'thumb-up' },
-  { key: 'onPromotion', label: 'On Promotion', icon: 'tag-outline', iconActive: 'tag' },
+  { key: 'home', label: 'Home', icon: 'home-circle-outline', iconActive: 'home-circle' },
+  { key: 'trending', label: 'Trending', icon: 'fire', iconActive: 'fire' },
+  { key: 'forYou', label: 'For You', icon: 'compass-outline', iconActive: 'compass' },
+  { key: 'onPromotion', label: 'On Promotion', icon: 'percent-outline', iconActive: 'percent' },
 ];
 
 export function BottomTabBar({ activeTab, onTabPress }: Props) {
@@ -43,7 +43,7 @@ export function BottomTabBar({ activeTab, onTabPress }: Props) {
           >
             <MaterialCommunityIcons
               name={isActive ? tab.iconActive : tab.icon}
-              size={scaleFont(21)}
+              size={scaleFont(25)}
               color={color}
             />
             <Text style={[styles.tabLabel, { fontSize: scaleFont(9), color }]}>{tab.label}</Text>

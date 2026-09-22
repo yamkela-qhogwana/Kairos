@@ -15,8 +15,8 @@ import { typography } from '../theme/typography';
 import { useScaleFont } from '../theme/responsive';
 import { fetchProducts, Product } from '../api/products';
 
-const GRID_GAP = 14;
-const SCREEN_PADDING = 20;
+const GRID_GAP = 6;
+const SCREEN_PADDING = 16;
 
 type Props = {
   title: string;

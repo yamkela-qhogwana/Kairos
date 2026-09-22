@@ -20,8 +20,8 @@ import { useScaleFont } from '../theme/responsive';
 import { fetchProducts, Product } from '../api/products';
 import { fetchCategories, Category } from '../api/categories';
 
-const GRID_GAP = 14;
-const SCREEN_PADDING = 20;
+const GRID_GAP = 6;
+const SCREEN_PADDING = 16;
 const CATEGORY_COLORS = ['#e8c9a0', '#ddaba8', '#c6a3c9', '#a3b9cf', '#f5d78e', '#9fd8c9'];
 
 type HeroCard =
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
   categoryChip: {
     borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: 6,
     paddingHorizontal: 14,
     paddingVertical: 8,
   },
@@ -422,14 +422,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 12,
     left: 12,
-    backgroundColor: colors.error,
-    borderRadius: 4,
+    backgroundColor: colors.dotGold,
+    borderRadius: 0,
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
   heroBadgeText: {
     fontFamily: typography.bold,
-    color: '#fff',
+    color: '#08090b',
     letterSpacing: 0.5,
   },
   heroTextWrap: {
