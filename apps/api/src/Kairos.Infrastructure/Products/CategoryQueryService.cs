@@ -9,7 +9,7 @@ public class CategoryQueryService(KairosDbContext dbContext) : ICategoryQuerySer
     public async Task<IReadOnlyList<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default)
     {
         return await dbContext.Categories
-            .Where(c => c.IsActive)
+            .Where(c => c.IsActive && c.Products.Any(p => p.IsActive))
             .OrderBy(c => c.Name)
             .Select(c => new CategoryDto
             {

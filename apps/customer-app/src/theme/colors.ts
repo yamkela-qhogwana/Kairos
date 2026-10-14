@@ -8,6 +8,8 @@ export const colors = {
   dotBlue: '#a3b9cf',
   error: '#e0857e',
 
+  imageBg: '#ffffff',
+
   wordmarkGradient: ['#e8c9a0', '#ddaba8', '#c6a3c9', '#a3b9cf'] as [string, string, ...string[]],
   wordmarkGradientLocations: [0, 0.35, 0.65, 1] as [number, number, ...number[]],
 

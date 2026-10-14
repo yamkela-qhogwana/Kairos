@@ -18,9 +18,10 @@ type Props = {
   product: Product;
   scaleFont: (size: number) => number;
   width: number;
+  onPress?: () => void;
 };
 
-export function ProductCard({ product, scaleFont, width }: Props) {
+export function ProductCard({ product, scaleFont, width, onPress }: Props) {
   const [activeImage, setActiveImage] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const images = product.images.length > 0 ? product.images : [undefined];
@@ -31,7 +32,7 @@ export function ProductCard({ product, scaleFont, width }: Props) {
   };
 
   return (
-    <View style={[styles.card, { width }]}>
+    <Pressable style={[styles.card, { width }]} onPress={onPress}>
       <View style={styles.imageWrap}>
         {images.length > 1 ? (
           <ScrollView
@@ -112,7 +113,7 @@ export function ProductCard({ product, scaleFont, width }: Props) {
           {product.rating.toFixed(1)}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 
@@ -121,10 +122,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   imageWrap: {
-    aspectRatio: 0.75,
-    borderRadius: 0,
+    aspectRatio: 1,
+    borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: colors.imageBg,
     marginBottom: 4,
   },
   image: {
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
   },
   originalPrice: {
     fontFamily: typography.regular,
-    color: colors.muted,
+    color: colors.error,
     textDecorationLine: 'line-through',
   },
   ratingRow: {

@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   instruction: {
-    fontFamily: typography.regular,
+    fontFamily: typography.medium,
     fontSize: 11.5,
     color: colors.muted,
     marginBottom: 26,
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   backText: {
-    fontFamily: typography.regular,
+    fontFamily: typography.medium,
     fontSize: 11.5,
     color: colors.muted,
     textAlign: 'center',

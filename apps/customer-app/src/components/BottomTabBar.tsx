@@ -22,7 +22,7 @@ const TABS: {
   { key: 'home', label: 'Home', icon: 'home-circle-outline', iconActive: 'home-circle' },
   { key: 'trending', label: 'Trending', icon: 'fire', iconActive: 'fire' },
   { key: 'forYou', label: 'For You', icon: 'compass-outline', iconActive: 'compass' },
-  { key: 'onPromotion', label: 'On Promotion', icon: 'percent-outline', iconActive: 'percent' },
+  { key: 'onPromotion', label: 'Promo', icon: 'percent-outline', iconActive: 'percent' },
 ];
 
 export function BottomTabBar({ activeTab, onTabPress }: Props) {
@@ -46,7 +46,7 @@ export function BottomTabBar({ activeTab, onTabPress }: Props) {
               size={scaleFont(25)}
               color={color}
             />
-            <Text style={[styles.tabLabel, { fontSize: scaleFont(9), color }]}>{tab.label}</Text>
+            <Text style={[styles.tabLabel, { fontSize: scaleFont(8), color }]}>{tab.label}</Text>
           </Pressable>
         );
       })}
@@ -68,6 +68,8 @@ const styles = StyleSheet.create({
     gap: 3,
   },
   tabLabel: {
-    fontFamily: typography.medium,
+    fontFamily: typography.semiBold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
 });

@@ -1,7 +1,13 @@
 import React from 'react';
 import { ProductGridScreen } from '../components/ProductGridScreen';
+import { Product } from '../api/products';
 
-export function OnPromotionScreen() {
+type Props = {
+  onSearchPress: () => void;
+  onSelectProduct: (product: Product) => void;
+};
+
+export function OnPromotionScreen({ onSearchPress, onSelectProduct }: Props) {
   return (
     <ProductGridScreen
       title="On Promotion"
@@ -11,6 +17,8 @@ export function OnPromotionScreen() {
           .filter((p) => p.isOnSale)
           .sort((a, b) => (b.discountPercentage ?? 0) - (a.discountPercentage ?? 0))
       }
+      onSearchPress={onSearchPress}
+      onSelectProduct={onSelectProduct}
     />
   );
 }

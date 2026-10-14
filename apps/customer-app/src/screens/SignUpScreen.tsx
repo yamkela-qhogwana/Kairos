@@ -820,7 +820,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   loginText: {
-    fontFamily: typography.regular,
+    fontFamily: typography.medium,
     fontSize: 11.5,
     color: colors.muted,
   },

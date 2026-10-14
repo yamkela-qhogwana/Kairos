@@ -2,21 +2,56 @@ import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { BottomTabBar, TabKey } from '../components/BottomTabBar';
 import { colors } from '../theme/colors';
+import { Product } from '../api/products';
 import { HomeScreen } from './HomeScreen';
 import { TrendingScreen } from './TrendingScreen';
 import { ForYouScreen } from './ForYouScreen';
 import { OnPromotionScreen } from './OnPromotionScreen';
+import { SearchScreen } from './SearchScreen';
+import { ProductDetailScreen } from './ProductDetailScreen';
 
 export function MainTabs() {
   const [activeTab, setActiveTab] = useState<TabKey>('home');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  if (selectedProduct) {
+    return (
+      <View style={styles.root}>
+        <ProductDetailScreen
+          product={selectedProduct}
+          onBack={() => setSelectedProduct(null)}
+          onSelectProduct={setSelectedProduct}
+        />
+      </View>
+    );
+  }
+
+  if (isSearchOpen) {
+    return (
+      <View style={styles.root}>
+        <SearchScreen onClose={() => setIsSearchOpen(false)} onSelectProduct={setSelectedProduct} />
+      </View>
+    );
+  }
+
+  const openSearch = () => setIsSearchOpen(true);
 
   return (
     <View style={styles.root}>
       <View style={styles.content}>
-        {activeTab === 'home' ? <HomeScreen /> : null}
-        {activeTab === 'trending' ? <TrendingScreen /> : null}
-        {activeTab === 'forYou' ? <ForYouScreen /> : null}
-        {activeTab === 'onPromotion' ? <OnPromotionScreen /> : null}
+        {activeTab === 'home' ? (
+          <HomeScreen onSearchPress={openSearch} onSelectProduct={setSelectedProduct} />
+        ) : null}
+        {activeTab === 'trending' ? (
+          <TrendingScreen onSearchPress={openSearch} onSelectProduct={setSelectedProduct} />
+        ) : null}
+        {activeTab === 'forYou' ? (
+          <ForYouScreen onSearchPress={openSearch} onSelectProduct={setSelectedProduct} />
+        ) : null}
+        {activeTab === 'onPromotion' ? (
+          <OnPromotionScreen onSearchPress={openSearch} onSelectProduct={setSelectedProduct} />
+        ) : null}
       </View>
       <BottomTabBar activeTab={activeTab} onTabPress={setActiveTab} />
     </View>

@@ -31,7 +31,9 @@ export default function App() {
     Montserrat_700Bold,
   });
   const [showSplash, setShowSplash] = useState(true);
-  const [onboardingDone, setOnboardingDone] = useState(false);
+  // Onboarding slides are stashed for now, not deleted — flip this back to
+  // false to bring them back into the flow.
+  const [onboardingDone, setOnboardingDone] = useState(true);
   const [authScreen, setAuthScreen] = useState<'signup' | 'login' | 'forgotPassword'>('signup');
   const [currentUser, setCurrentUser] = useState<AuthResponse | null>(null);
 

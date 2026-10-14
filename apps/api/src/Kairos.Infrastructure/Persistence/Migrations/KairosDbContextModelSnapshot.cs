@@ -131,64 +131,92 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         {
                             CategoryId = (byte)1,
                             IsActive = true,
-                            Name = "Dresses",
-                            Slug = "womens-dresses"
+                            Name = "Men's",
+                            Slug = "mens"
                         },
                         new
                         {
                             CategoryId = (byte)2,
                             IsActive = true,
-                            Name = "Tops",
-                            Slug = "tops"
+                            Name = "Women's",
+                            Slug = "womens"
                         },
                         new
                         {
                             CategoryId = (byte)3,
                             IsActive = true,
-                            Name = "Women's Shoes",
-                            Slug = "womens-shoes"
+                            Name = "Beauty",
+                            Slug = "beauty"
                         },
                         new
                         {
                             CategoryId = (byte)4,
                             IsActive = true,
-                            Name = "Bags",
-                            Slug = "womens-bags"
+                            Name = "Home",
+                            Slug = "home"
                         },
                         new
                         {
                             CategoryId = (byte)5,
                             IsActive = true,
-                            Name = "Jewellery",
-                            Slug = "womens-jewellery"
+                            Name = "Kids",
+                            Slug = "kids"
                         },
                         new
                         {
                             CategoryId = (byte)6,
                             IsActive = true,
-                            Name = "Sunglasses",
-                            Slug = "sunglasses"
+                            Name = "Office",
+                            Slug = "office"
                         },
                         new
                         {
                             CategoryId = (byte)7,
                             IsActive = true,
-                            Name = "Men's Shirts",
-                            Slug = "mens-shirts"
+                            Name = "Electronics",
+                            Slug = "electronics"
                         },
                         new
                         {
                             CategoryId = (byte)8,
                             IsActive = true,
-                            Name = "Men's Shoes",
-                            Slug = "mens-shoes"
+                            Name = "Curve",
+                            Slug = "curve"
                         },
                         new
                         {
                             CategoryId = (byte)9,
                             IsActive = true,
-                            Name = "Watches",
-                            Slug = "mens-watches"
+                            Name = "Jewelry",
+                            Slug = "jewelry"
+                        },
+                        new
+                        {
+                            CategoryId = (byte)10,
+                            IsActive = true,
+                            Name = "Sports",
+                            Slug = "sports"
+                        },
+                        new
+                        {
+                            CategoryId = (byte)11,
+                            IsActive = true,
+                            Name = "Bags",
+                            Slug = "bags"
+                        },
+                        new
+                        {
+                            CategoryId = (byte)12,
+                            IsActive = true,
+                            Name = "Toys",
+                            Slug = "toys"
+                        },
+                        new
+                        {
+                            CategoryId = (byte)13,
+                            IsActive = true,
+                            Name = "Seasonal",
+                            Slug = "seasonal"
                         });
                 });
 
@@ -273,7 +301,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 1L,
-                            CategoryId = (byte)1,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 10,
                             IsActive = true,
@@ -286,7 +314,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 2L,
-                            CategoryId = (byte)1,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 16,
                             IsActive = true,
@@ -299,7 +327,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 3L,
-                            CategoryId = (byte)1,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
                             IsActive = true,
@@ -312,7 +340,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 4L,
-                            CategoryId = (byte)1,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
                             IsActive = true,
@@ -325,7 +353,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 5L,
-                            CategoryId = (byte)1,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 19,
                             IsActive = true,
@@ -403,7 +431,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 11L,
-                            CategoryId = (byte)3,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 3,
                             IsActive = true,
@@ -416,7 +444,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 12L,
-                            CategoryId = (byte)3,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 3,
                             IsActive = true,
@@ -429,7 +457,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 13L,
-                            CategoryId = (byte)3,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 14,
                             IsActive = true,
@@ -442,7 +470,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 14L,
-                            CategoryId = (byte)3,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 14,
                             IsActive = true,
@@ -455,7 +483,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 15L,
-                            CategoryId = (byte)3,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
                             IsActive = true,
@@ -468,7 +496,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 16L,
-                            CategoryId = (byte)4,
+                            CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
                             IsActive = true,
@@ -481,7 +509,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 17L,
-                            CategoryId = (byte)4,
+                            CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 4,
                             IsActive = true,
@@ -494,7 +522,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 18L,
-                            CategoryId = (byte)4,
+                            CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 14,
                             IsActive = true,
@@ -507,7 +535,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 19L,
-                            CategoryId = (byte)4,
+                            CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
                             IsActive = true,
@@ -520,7 +548,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 20L,
-                            CategoryId = (byte)4,
+                            CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 12,
                             IsActive = true,
@@ -533,7 +561,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 21L,
-                            CategoryId = (byte)5,
+                            CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
                             IsActive = true,
@@ -546,7 +574,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 22L,
-                            CategoryId = (byte)5,
+                            CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
                             IsActive = true,
@@ -559,7 +587,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 23L,
-                            CategoryId = (byte)5,
+                            CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 1,
                             IsActive = true,
@@ -572,7 +600,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 24L,
-                            CategoryId = (byte)6,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 5,
                             IsActive = true,
@@ -585,7 +613,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 25L,
-                            CategoryId = (byte)6,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 5,
                             IsActive = true,
@@ -598,7 +626,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 26L,
-                            CategoryId = (byte)6,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 1,
                             IsActive = true,
@@ -611,7 +639,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 27L,
-                            CategoryId = (byte)6,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 11,
                             IsActive = true,
@@ -624,7 +652,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 28L,
-                            CategoryId = (byte)6,
+                            CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 2,
                             IsActive = true,
@@ -637,7 +665,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 29L,
-                            CategoryId = (byte)7,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 15,
                             IsActive = true,
@@ -650,7 +678,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 30L,
-                            CategoryId = (byte)7,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 1,
                             IsActive = true,
@@ -663,7 +691,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 31L,
-                            CategoryId = (byte)7,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 20,
                             IsActive = true,
@@ -676,7 +704,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 32L,
-                            CategoryId = (byte)7,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 7,
                             IsActive = true,
@@ -689,7 +717,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 33L,
-                            CategoryId = (byte)7,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 11,
                             IsActive = true,
@@ -702,7 +730,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 34L,
-                            CategoryId = (byte)8,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 4,
                             IsActive = true,
@@ -715,7 +743,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 35L,
-                            CategoryId = (byte)8,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
                             IsActive = true,
@@ -728,7 +756,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 36L,
-                            CategoryId = (byte)8,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 4,
                             IsActive = true,
@@ -741,7 +769,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 37L,
-                            CategoryId = (byte)8,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 5,
                             IsActive = true,
@@ -754,7 +782,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 38L,
-                            CategoryId = (byte)8,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             OriginalPrice = 109.99m,
@@ -765,7 +793,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 39L,
-                            CategoryId = (byte)9,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 6,
                             IsActive = true,
@@ -778,7 +806,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 40L,
-                            CategoryId = (byte)9,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 17,
                             IsActive = true,
@@ -791,7 +819,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 41L,
-                            CategoryId = (byte)9,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 9,
                             IsActive = true,
@@ -804,7 +832,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 42L,
-                            CategoryId = (byte)9,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 18,
                             IsActive = true,
@@ -817,7 +845,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 43L,
-                            CategoryId = (byte)9,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 4,
                             IsActive = true,
@@ -830,7 +858,7 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         new
                         {
                             ProductId = 44L,
-                            CategoryId = (byte)9,
+                            CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             DiscountPercentage = 5,
                             IsActive = true,

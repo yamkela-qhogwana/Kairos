@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -22,14 +22,21 @@ type Props = {
   title: string;
   subtitle?: string;
   selectProducts: (all: Product[]) => Product[];
+  onSearchPress: () => void;
+  onSelectProduct: (product: Product) => void;
 };
 
-export function ProductGridScreen({ title, subtitle, selectProducts }: Props) {
+export function ProductGridScreen({
+  title,
+  subtitle,
+  selectProducts,
+  onSearchPress,
+  onSelectProduct,
+}: Props) {
   const scaleFont = useScaleFont();
   const { width } = useWindowDimensions();
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,15 +63,11 @@ export function ProductGridScreen({ title, subtitle, selectProducts }: Props) {
   }, [load]);
 
   const gridItemWidth = (width - SCREEN_PADDING * 2 - GRID_GAP) / 2;
-  const query = searchQuery.trim().toLowerCase();
-  const displayedProducts = useMemo(() => {
-    const base = selectProducts(products);
-    return query ? base.filter((p) => p.title.toLowerCase().includes(query)) : base;
-  }, [products, query, selectProducts]);
+  const displayedProducts = selectProducts(products);
 
   return (
     <View style={styles.screen}>
-      <AppHeader searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <AppHeader onSearchPress={onSearchPress} />
 
       {isLoading ? (
         <View style={styles.centerFill}>
@@ -90,14 +93,17 @@ export function ProductGridScreen({ title, subtitle, selectProducts }: Props) {
             />
           }
           renderItem={({ item }) => (
-            <ProductCard product={item} scaleFont={scaleFont} width={gridItemWidth} />
+            <ProductCard
+              product={item}
+              scaleFont={scaleFont}
+              width={gridItemWidth}
+              onPress={() => onSelectProduct(item)}
+            />
           )}
           ListHeaderComponent={
             <View style={styles.titleBlock}>
-              <Text style={[styles.title, { fontSize: scaleFont(18) }]}>
-                {query ? 'Search Results' : title}
-              </Text>
-              {!query && subtitle ? (
+              <Text style={[styles.title, { fontSize: scaleFont(18) }]}>{title}</Text>
+              {subtitle ? (
                 <Text style={[styles.subtitle, { fontSize: scaleFont(11.5) }]}>{subtitle}</Text>
               ) : null}
             </View>

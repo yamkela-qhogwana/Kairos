@@ -15,7 +15,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CardDotPattern } from '../components/CardDotPattern';
 import { KairosWordmark } from '../components/KairosWordmark';
-import { OrbitGlow } from '../components/OrbitGlow';
 import { FieldError } from '../components/FieldError';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
@@ -150,10 +149,6 @@ export function LoginScreen({ onSubmit, onSignUpPress, onForgotPasswordPress }: 
             Enter your email address and password to continue
           </Text>
 
-          <View style={styles.glowWrap}>
-            <OrbitGlow />
-          </View>
-
           <View style={styles.field}>
             <TextInput
               placeholderTextColor={colors.muted}
@@ -285,10 +280,10 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   instruction: {
-    fontFamily: typography.regular,
+    fontFamily: typography.medium,
     fontSize: 11.5,
     color: colors.muted,
-    marginBottom: 22,
+    marginBottom: 32,
   },
   field: {
     marginBottom: 16,
@@ -321,10 +316,6 @@ const styles = StyleSheet.create({
     color: colors.dotGold,
     textDecorationLine: 'underline',
     textTransform: 'uppercase',
-  },
-  glowWrap: {
-    alignItems: 'center',
-    marginBottom: 40,
   },
   input: {
     fontFamily: typography.regular,
@@ -361,7 +352,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   signUpText: {
-    fontFamily: typography.regular,
+    fontFamily: typography.medium,
     fontSize: 11.5,
     color: colors.muted,
   },

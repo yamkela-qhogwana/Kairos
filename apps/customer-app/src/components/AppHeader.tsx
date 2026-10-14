@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { KairosWordmark } from './KairosWordmark';
@@ -10,11 +10,10 @@ import { useScaleFont } from '../theme/responsive';
 const SCREEN_PADDING = 16;
 
 type Props = {
-  searchQuery: string;
-  onSearchChange: (text: string) => void;
+  onSearchPress: () => void;
 };
 
-export function AppHeader({ searchQuery, onSearchChange }: Props) {
+export function AppHeader({ onSearchPress }: Props) {
   const insets = useSafeAreaInsets();
   const scaleFont = useScaleFont();
 
@@ -39,19 +38,10 @@ export function AppHeader({ searchQuery, onSearchChange }: Props) {
         </View>
       </View>
 
-      <View style={styles.searchBar}>
+      <Pressable style={styles.searchBar} onPress={onSearchPress}>
         <MaterialCommunityIcons name="magnify" size={scaleFont(18)} color={colors.muted} />
-        <TextInput
-          placeholder="Search Kairos"
-          placeholderTextColor={colors.muted}
-          style={[styles.searchInput, { fontSize: scaleFont(13) }]}
-          value={searchQuery}
-          onChangeText={onSearchChange}
-          autoCapitalize="none"
-          autoCorrect={false}
-          returnKeyType="search"
-        />
-      </View>
+        <Text style={[styles.searchPlaceholder, { fontSize: scaleFont(13) }]}>Search Kairos</Text>
+      </Pressable>
     </View>
   );
 }
@@ -86,10 +76,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
-  searchInput: {
+  searchPlaceholder: {
     flex: 1,
     fontFamily: typography.regular,
-    color: colors.text,
-    padding: 0,
+    color: colors.muted,
   },
 });
