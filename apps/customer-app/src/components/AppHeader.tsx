@@ -11,15 +11,21 @@ const SCREEN_PADDING = 16;
 
 type Props = {
   onSearchPress: () => void;
+  onBack?: () => void;
 };
 
-export function AppHeader({ onSearchPress }: Props) {
+export function AppHeader({ onSearchPress, onBack }: Props) {
   const insets = useSafeAreaInsets();
   const scaleFont = useScaleFont();
 
   return (
     <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
       <View style={styles.headerTopRow}>
+        {onBack ? (
+          <Pressable hitSlop={10} onPress={onBack} style={styles.backButton}>
+            <MaterialCommunityIcons name="arrow-left" size={scaleFont(22)} color={colors.text} />
+          </Pressable>
+        ) : null}
         <KairosWordmark fontSize={scaleFont(18)} />
         <View style={styles.headerIconsRow}>
           <Pressable hitSlop={10} style={styles.headerIconButton}>
@@ -55,7 +61,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 10,
     marginBottom: 14,
+  },
+  backButton: {
+    padding: 4,
   },
   headerIconsRow: {
     flexDirection: 'row',

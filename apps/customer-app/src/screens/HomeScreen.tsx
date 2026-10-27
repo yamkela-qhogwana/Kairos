@@ -1,40 +1,42 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppHeader } from '../components/AppHeader';
 import { ProductCard } from '../components/ProductCard';
 import { PromoCarousel } from '../components/PromoCarousel';
 import { CategoryCollage } from '../components/CategoryCollage';
+import { HomeSkeleton } from '../components/HomeSkeleton';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { useScaleFont } from '../theme/responsive';
 import { fetchProducts, Product } from '../api/products';
 import { fetchCategories, Category } from '../api/categories';
+import { fetchCollections, Collection } from '../api/collections';
 
 const GRID_GAP = 6;
 const SCREEN_PADDING = 16;
-const CATEGORY_COLORS = ['#e8c9a0', '#ddaba8', '#c6a3c9', '#a3b9cf', '#f5d78e', '#9fd8c9'];
 
 type Props = {
   onSearchPress: () => void;
   onSelectProduct: (product: Product) => void;
+  onOpenCollection: (slug: string) => void;
 };
 
-export function HomeScreen({ onSearchPress, onSelectProduct }: Props) {
+export function HomeScreen({ onSearchPress, onSelectProduct, onOpenCollection }: Props) {
   const scaleFont = useScaleFont();
   const { width } = useWindowDimensions();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,6 +47,12 @@ export function HomeScreen({ onSearchPress, onSelectProduct }: Props) {
       .catch(() => {
         // The category collage is a nice-to-have — if this fails the
         // product grid below still works, so fail silently here.
+      });
+    fetchCollections()
+      .then(setCollections)
+      .catch(() => {
+        // Same deal as categories — the collection buttons are a
+        // nice-to-have, not load-bearing for the product grid.
       });
   }, []);
 
@@ -76,9 +84,7 @@ export function HomeScreen({ onSearchPress, onSelectProduct }: Props) {
       <AppHeader onSearchPress={onSearchPress} />
 
       {isLoading ? (
-        <View style={styles.centerFill}>
-          <ActivityIndicator color={colors.dotGold} />
-        </View>
+        <HomeSkeleton />
       ) : error && products.length === 0 ? (
         <View style={styles.centerFill}>
           <Text style={[styles.errorText, { fontSize: scaleFont(12) }]}>{error}</Text>
@@ -113,27 +119,26 @@ export function HomeScreen({ onSearchPress, onSelectProduct }: Props) {
 
               <CategoryCollage categories={categories} products={products} />
 
-              {categories.length > 0 ? (
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={styles.categoryButtonRow}
-                >
-                  {categories.map((category, index) => (
-                    <Pressable
-                      key={category.categoryId}
-                      style={[
-                        styles.categoryButton,
-                        { backgroundColor: CATEGORY_COLORS[index % CATEGORY_COLORS.length] },
-                      ]}
-                    >
-                      <Text style={[styles.categoryButtonText, { fontSize: scaleFont(11) }]}>
-                        {category.name}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </ScrollView>
-              ) : null}
+              <View style={styles.categoryButtonRow}>
+                {collections
+                  .filter((collection) => collection.slug !== 'rent')
+                  .map((collection) => (
+                  <Pressable
+                    key={collection.collectionId}
+                    style={styles.categoryButton}
+                    onPress={() => onOpenCollection(collection.slug)}
+                  >
+                    <MaterialCommunityIcons
+                      name={collection.icon as React.ComponentProps<typeof MaterialCommunityIcons>['name']}
+                      size={scaleFont(14)}
+                      color="#08090b"
+                    />
+                    <Text style={[styles.categoryButtonText, { fontSize: scaleFont(9.5) }]}>
+                      {collection.name}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
             </View>
           }
           ListEmptyComponent={
@@ -174,16 +179,23 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   categoryButtonRow: {
+    flexDirection: 'row',
     gap: 8,
     paddingBottom: 18,
   },
   categoryButton: {
-    borderRadius: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+    borderRadius: 0,
+    backgroundColor: '#ffffff',
+    paddingVertical: 10,
   },
   categoryButtonText: {
-    fontFamily: typography.semiBold,
+    fontFamily: typography.medium,
     color: '#08090b',
+    textAlign: 'center',
   },
 });

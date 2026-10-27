@@ -16,6 +16,7 @@ import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { useScaleFont } from '../theme/responsive';
 import { fetchProducts, Product } from '../api/products';
+import { formatTimeLeft } from '../utils/timeLeft';
 
 const GRID_GAP = 6;
 const SCREEN_PADDING = 16;
@@ -43,6 +44,7 @@ export function ProductDetailScreen({ product, onBack, onSelectProduct }: Props)
 
   const images = product.images.length > 0 ? product.images : [undefined];
   const gridItemWidth = (width - SCREEN_PADDING * 2 - GRID_GAP) / 2;
+  const timeLeft = product.isOnSale ? formatTimeLeft(product.saleEndsAt) : null;
 
   return (
     <View style={styles.screen}>
@@ -69,6 +71,25 @@ export function ProductDetailScreen({ product, onBack, onSelectProduct }: Props)
           >
             <MaterialCommunityIcons name="arrow-left" size={scaleFont(22)} color="#fff" />
           </Pressable>
+
+          <View style={[styles.headerIconsRow, { top: insets.top + 12 }]}>
+            <Pressable hitSlop={10} style={styles.headerIconButton}>
+              <MaterialCommunityIcons name="heart-outline" size={scaleFont(20)} color="#fff" />
+            </Pressable>
+            <Pressable hitSlop={10} style={styles.headerIconButton}>
+              <MaterialCommunityIcons name="shopping-outline" size={scaleFont(20)} color="#fff" />
+            </Pressable>
+            <Pressable hitSlop={10} style={styles.headerIconButton}>
+              <MaterialCommunityIcons name="account-circle-outline" size={scaleFont(22)} color="#fff" />
+            </Pressable>
+          </View>
+
+          {timeLeft ? (
+            <View style={styles.timeLeftBadge}>
+              <MaterialCommunityIcons name="clock-outline" size={scaleFont(12)} color="#fff" />
+              <Text style={[styles.timeLeftText, { fontSize: scaleFont(11) }]}>{timeLeft}</Text>
+            </View>
+          ) : null}
 
           {images.length > 1 ? (
             <View style={styles.dotsRow}>
@@ -167,6 +188,34 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 20,
     backgroundColor: 'rgba(8, 9, 11, 0.5)',
+  },
+  headerIconsRow: {
+    position: 'absolute',
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  headerIconButton: {
+    padding: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(8, 9, 11, 0.5)',
+  },
+  timeLeftBadge: {
+    position: 'absolute',
+    left: 16,
+    bottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(8, 9, 11, 0.78)',
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  timeLeftText: {
+    fontFamily: typography.semiBold,
+    color: '#fff',
   },
   dotsRow: {
     position: 'absolute',

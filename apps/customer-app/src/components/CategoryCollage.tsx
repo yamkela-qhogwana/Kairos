@@ -31,7 +31,6 @@ export function CategoryCollage({ categories, products }: Props) {
 
   return (
     <View style={styles.panel}>
-      <Text style={[styles.heading, { fontSize: scaleFont(12) }]}>Shop by Category</Text>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -42,7 +41,7 @@ export function CategoryCollage({ categories, products }: Props) {
             <View style={styles.imageWrap}>
               {image ? <Image source={{ uri: image }} style={styles.image} resizeMode="cover" /> : null}
             </View>
-            <Text numberOfLines={1} style={[styles.tileLabel, { fontSize: scaleFont(10) }]}>
+            <Text numberOfLines={1} style={[styles.tileLabel, { fontSize: scaleFont(8) }]}>
               {category.name}
             </Text>
           </View>
@@ -56,15 +55,8 @@ const styles = StyleSheet.create({
   panel: {
     backgroundColor: '#eeece6',
     borderRadius: 14,
-    paddingTop: 14,
-    paddingBottom: 16,
+    paddingVertical: 16,
     marginBottom: 20,
-  },
-  heading: {
-    fontFamily: typography.bold,
-    color: '#2a2822',
-    paddingHorizontal: 16,
-    marginBottom: 10,
   },
   row: {
     paddingHorizontal: 16,
@@ -87,7 +79,9 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   tileLabel: {
-    fontFamily: typography.bold,
+    fontFamily: typography.semiBold,
+    textTransform: 'uppercase',
+    letterSpacing: 0.3,
     // A deeper gold than colors.dotGold — the pale champagne tone is tuned
     // for the dark theme and is too low-contrast on this light panel.
     color: '#9c6b2e',

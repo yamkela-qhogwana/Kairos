@@ -24,6 +24,7 @@ type Props = {
   selectProducts: (all: Product[]) => Product[];
   onSearchPress: () => void;
   onSelectProduct: (product: Product) => void;
+  onBack?: () => void;
 };
 
 export function ProductGridScreen({
@@ -32,6 +33,7 @@ export function ProductGridScreen({
   selectProducts,
   onSearchPress,
   onSelectProduct,
+  onBack,
 }: Props) {
   const scaleFont = useScaleFont();
   const { width } = useWindowDimensions();
@@ -67,7 +69,7 @@ export function ProductGridScreen({
 
   return (
     <View style={styles.screen}>
-      <AppHeader onSearchPress={onSearchPress} />
+      <AppHeader onSearchPress={onSearchPress} onBack={onBack} />
 
       {isLoading ? (
         <View style={styles.centerFill}>

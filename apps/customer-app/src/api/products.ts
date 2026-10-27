@@ -7,11 +7,17 @@ export type Product = {
   categoryId: number;
   categorySlug: string;
   categoryName: string;
+  subcategorySlug: string | null;
+  subcategoryName: string | null;
+  sizes: { size: string; quantity: number; unitsSold: number }[];
   originalPrice: number;
   salePrice: number | null;
   discountPercentage: number | null;
   isOnSale: boolean;
+  saleEndsAt: string | null;
   rating: number;
+  isRentable: boolean;
+  isLuxe: boolean;
   images: string[];
   storeId: number;
   storeName: string;

@@ -3,6 +3,7 @@ import { Product } from './products';
 
 export type SearchResult = {
   interpretation: string | null;
+  correctedQuery: string | null;
   products: Product[];
 };
 

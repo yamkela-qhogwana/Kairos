@@ -17,6 +17,11 @@ public class Product
     public byte CategoryId { get; set; }
     public Category Category { get; set; } = null!;
 
+    public byte? SubcategoryId { get; set; }
+    public Subcategory? Subcategory { get; set; }
+
+    public ICollection<ProductSize> Sizes { get; set; } = new List<ProductSize>();
+
     public decimal OriginalPrice { get; set; }
 
     // Vendor-set discounted price. Null = not on sale.
@@ -28,6 +33,16 @@ public class Product
 
     public double Rating { get; set; }
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
+
+    // Drives the "Rent" collection — a simple flag, not a full rental
+    // system (no duration/rate/booking logic yet).
+    public bool IsRentable { get; set; }
+
+    // Drives the "Luxe" collection. Unlike IsRentable, this isn't something
+    // a seller sets on their own listing — it's a platform-verified badge
+    // meaning the item has been checked as authentic and high quality, not
+    // derived from price and not self-declared.
+    public bool IsLuxe { get; set; }
 
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

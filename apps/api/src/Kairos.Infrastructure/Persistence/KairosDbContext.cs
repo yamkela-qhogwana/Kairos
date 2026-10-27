@@ -12,7 +12,10 @@ public class KairosDbContext(DbContextOptions<KairosDbContext> options) : DbCont
     public DbSet<Store> Stores => Set<Store>();
     public DbSet<Sale> Sales => Set<Sale>();
     public DbSet<Category> Categories => Set<Category>();
+    public DbSet<Collection> Collections => Set<Collection>();
+    public DbSet<Subcategory> Subcategories => Set<Subcategory>();
     public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductSize> ProductSizes => Set<ProductSize>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -74,6 +77,21 @@ public class KairosDbContext(DbContextOptions<KairosDbContext> options) : DbCont
             entity.HasIndex(c => c.Slug).IsUnique();
         });
 
+        modelBuilder.Entity<Collection>(entity =>
+        {
+            entity.HasIndex(c => c.Slug).IsUnique();
+        });
+
+        modelBuilder.Entity<Subcategory>(entity =>
+        {
+            entity.HasIndex(s => s.Slug).IsUnique();
+
+            entity.HasOne(s => s.Category)
+                .WithMany()
+                .HasForeignKey(s => s.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
         modelBuilder.Entity<Product>(entity =>
         {
             entity.Property(p => p.OriginalPrice).HasColumnType("decimal(10,2)");
@@ -93,6 +111,11 @@ public class KairosDbContext(DbContextOptions<KairosDbContext> options) : DbCont
                 .WithMany(c => c.Products)
                 .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(p => p.Subcategory)
+                .WithMany(s => s.Products)
+                .HasForeignKey(p => p.SubcategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<ProductImage>(entity =>
@@ -103,6 +126,16 @@ public class KairosDbContext(DbContextOptions<KairosDbContext> options) : DbCont
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasIndex(pi => new { pi.ProductId, pi.SortOrder });
+        });
+
+        modelBuilder.Entity<ProductSize>(entity =>
+        {
+            entity.HasOne(ps => ps.Product)
+                .WithMany(p => p.Sizes)
+                .HasForeignKey(ps => ps.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(ps => new { ps.ProductId, ps.Size }).IsUnique();
         });
 
         modelBuilder.Entity<AddressType>().HasData(
@@ -136,52 +169,122 @@ public class KairosDbContext(DbContextOptions<KairosDbContext> options) : DbCont
             new Category { CategoryId = 13, Slug = "seasonal", Name = "Seasonal", IsActive = true }
         );
 
-        modelBuilder.Entity<Product>().HasData(
-            new Product { ProductId = 1, StoreId = 1, Title = "Black Women's Gown", CategoryId = 2, OriginalPrice = 129.99m, SalePrice = 116.99m, DiscountPercentage = 10, Rating = 3.64, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 2, StoreId = 1, Title = "Corset Leather With Skirt", CategoryId = 2, OriginalPrice = 89.99m, SalePrice = 75.59m, DiscountPercentage = 16, Rating = 3.05, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 3, StoreId = 1, Title = "Corset With Black Skirt", CategoryId = 2, OriginalPrice = 79.99m, SalePrice = 67.99m, DiscountPercentage = 15, Rating = 4.52, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 4, StoreId = 1, Title = "Dress Pea", CategoryId = 2, OriginalPrice = 49.99m, SalePrice = 40.99m, DiscountPercentage = 18, Rating = 4.88, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 5, StoreId = 1, Title = "Marni Red & Black Suit", CategoryId = 2, OriginalPrice = 179.99m, SalePrice = 145.79m, DiscountPercentage = 19, Rating = 4.48, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 6, StoreId = 1, Title = "Blue Frock", CategoryId = 2, OriginalPrice = 29.99m, SalePrice = 26.39m, DiscountPercentage = 12, Rating = 4.17, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 7, StoreId = 1, Title = "Girl Summer Dress", CategoryId = 2, OriginalPrice = 19.99m, SalePrice = 16.19m, DiscountPercentage = 19, Rating = 4.77, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 8, StoreId = 1, Title = "Gray Dress", CategoryId = 2, OriginalPrice = 34.99m, SalePrice = 30.09m, DiscountPercentage = 14, Rating = 2.72, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 9, StoreId = 1, Title = "Short Frock", CategoryId = 2, OriginalPrice = 24.99m, SalePrice = 21.74m, DiscountPercentage = 13, Rating = 3.23, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 10, StoreId = 1, Title = "Tartan Dress", CategoryId = 2, OriginalPrice = 39.99m, SalePrice = 34.79m, DiscountPercentage = 13, Rating = 4.05, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 11, StoreId = 1, Title = "Black & Brown Slipper", CategoryId = 2, OriginalPrice = 19.99m, SalePrice = 19.39m, DiscountPercentage = 3, Rating = 2.53, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 12, StoreId = 1, Title = "Calvin Klein Heel Shoes", CategoryId = 2, OriginalPrice = 79.99m, SalePrice = 77.59m, DiscountPercentage = 3, Rating = 4.92, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 13, StoreId = 1, Title = "Golden Shoes Woman", CategoryId = 2, OriginalPrice = 49.99m, SalePrice = 42.99m, DiscountPercentage = 14, Rating = 3.26, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 14, StoreId = 1, Title = "Pampi Shoes", CategoryId = 2, OriginalPrice = 29.99m, SalePrice = 25.79m, DiscountPercentage = 14, Rating = 3.05, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 15, StoreId = 1, Title = "Red Shoes", CategoryId = 2, OriginalPrice = 34.99m, SalePrice = 28.69m, DiscountPercentage = 18, Rating = 3.25, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 16, StoreId = 1, Title = "Blue Women's Handbag", CategoryId = 11, OriginalPrice = 49.99m, SalePrice = 40.99m, DiscountPercentage = 18, Rating = 2.92, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 17, StoreId = 1, Title = "Heshe Women's Leather Bag", CategoryId = 11, OriginalPrice = 129.99m, SalePrice = 124.79m, DiscountPercentage = 4, Rating = 4.92, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 18, StoreId = 1, Title = "Prada Women Bag", CategoryId = 11, OriginalPrice = 599.99m, SalePrice = 515.99m, DiscountPercentage = 14, Rating = 2.71, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 19, StoreId = 1, Title = "White Faux Leather Backpack", CategoryId = 11, OriginalPrice = 39.99m, SalePrice = 33.99m, DiscountPercentage = 15, Rating = 3.36, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 20, StoreId = 1, Title = "Women Handbag Black", CategoryId = 11, OriginalPrice = 59.99m, SalePrice = 52.79m, DiscountPercentage = 12, Rating = 2.89, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 21, StoreId = 1, Title = "Green Crystal Earring", CategoryId = 9, OriginalPrice = 29.99m, SalePrice = 25.49m, DiscountPercentage = 15, Rating = 3.96, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 22, StoreId = 1, Title = "Green Oval Earring", CategoryId = 9, OriginalPrice = 24.99m, SalePrice = 21.24m, DiscountPercentage = 15, Rating = 3.57, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 23, StoreId = 1, Title = "Tropical Earring", CategoryId = 9, OriginalPrice = 19.99m, SalePrice = 19.79m, DiscountPercentage = 1, Rating = 4.4, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 24, StoreId = 1, Title = "Black Sun Glasses", CategoryId = 2, OriginalPrice = 29.99m, SalePrice = 28.49m, DiscountPercentage = 5, Rating = 4.41, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 25, StoreId = 1, Title = "Classic Sun Glasses", CategoryId = 2, OriginalPrice = 24.99m, SalePrice = 23.74m, DiscountPercentage = 5, Rating = 3.86, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 26, StoreId = 1, Title = "Green and Black Glasses", CategoryId = 2, OriginalPrice = 34.99m, SalePrice = 34.64m, DiscountPercentage = 1, Rating = 4.55, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 27, StoreId = 1, Title = "Party Glasses", CategoryId = 2, OriginalPrice = 19.99m, SalePrice = 17.79m, DiscountPercentage = 11, Rating = 2.79, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 28, StoreId = 1, Title = "Sunglasses", CategoryId = 2, OriginalPrice = 22.99m, SalePrice = 22.53m, DiscountPercentage = 2, Rating = 3.02, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 29, StoreId = 1, Title = "Blue & Black Check Shirt", CategoryId = 1, OriginalPrice = 29.99m, SalePrice = 25.49m, DiscountPercentage = 15, Rating = 3.64, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 30, StoreId = 1, Title = "Gigabyte Aorus Men Tshirt", CategoryId = 1, OriginalPrice = 24.99m, SalePrice = 24.74m, DiscountPercentage = 1, Rating = 3.18, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 31, StoreId = 1, Title = "Man Plaid Shirt", CategoryId = 1, OriginalPrice = 34.99m, SalePrice = 27.99m, DiscountPercentage = 20, Rating = 3.46, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 32, StoreId = 1, Title = "Man Short Sleeve Shirt", CategoryId = 1, OriginalPrice = 19.99m, SalePrice = 18.59m, DiscountPercentage = 7, Rating = 2.9, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 33, StoreId = 1, Title = "Men Check Shirt", CategoryId = 1, OriginalPrice = 27.99m, SalePrice = 24.91m, DiscountPercentage = 11, Rating = 2.72, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 34, StoreId = 1, Title = "Nike Air Jordan 1 Red And Black", CategoryId = 1, OriginalPrice = 149.99m, SalePrice = 143.99m, DiscountPercentage = 4, Rating = 4.77, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 35, StoreId = 1, Title = "Nike Baseball Cleats", CategoryId = 1, OriginalPrice = 79.99m, SalePrice = 65.59m, DiscountPercentage = 18, Rating = 3.88, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 36, StoreId = 1, Title = "Puma Future Rider Trainers", CategoryId = 1, OriginalPrice = 89.99m, SalePrice = 86.39m, DiscountPercentage = 4, Rating = 4.9, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 37, StoreId = 1, Title = "Sports Sneakers Off White & Red", CategoryId = 1, OriginalPrice = 119.99m, SalePrice = 113.99m, DiscountPercentage = 5, Rating = 4.77, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 38, StoreId = 1, Title = "Sports Sneakers Off White Red", CategoryId = 1, OriginalPrice = 109.99m, SalePrice = null, DiscountPercentage = null, Rating = 4.69, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 39, StoreId = 1, Title = "Brown Leather Belt Watch", CategoryId = 1, OriginalPrice = 89.99m, SalePrice = 84.59m, DiscountPercentage = 6, Rating = 4.19, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 40, StoreId = 1, Title = "Longines Master Collection", CategoryId = 1, OriginalPrice = 1499.99m, SalePrice = 1244.99m, DiscountPercentage = 17, Rating = 3.87, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 41, StoreId = 1, Title = "Rolex Cellini Date Black Dial", CategoryId = 1, OriginalPrice = 8999.99m, SalePrice = 8189.99m, DiscountPercentage = 9, Rating = 4.97, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 42, StoreId = 1, Title = "Rolex Cellini Moonphase", CategoryId = 1, OriginalPrice = 12999.99m, SalePrice = 10659.99m, DiscountPercentage = 18, Rating = 2.58, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 43, StoreId = 1, Title = "Rolex Datejust", CategoryId = 1, OriginalPrice = 10999.99m, SalePrice = 10559.99m, DiscountPercentage = 4, Rating = 3.66, IsActive = true, CreatedAt = seedDate },
-            new Product { ProductId = 44, StoreId = 1, Title = "Rolex Submariner Watch", CategoryId = 1, OriginalPrice = 13999.99m, SalePrice = 13299.99m, DiscountPercentage = 5, Rating = 2.69, IsActive = true, CreatedAt = seedDate }
+        modelBuilder.Entity<Subcategory>().HasData(
+            new Subcategory { SubcategoryId = 1, CategoryId = 2, Slug = "dresses", Name = "Dresses", SortOrder = 1, IsActive = true },
+            new Subcategory { SubcategoryId = 2, CategoryId = 2, Slug = "suits-corsets", Name = "Suits & Corsets", SortOrder = 2, IsActive = true },
+            new Subcategory { SubcategoryId = 3, CategoryId = 2, Slug = "shoes", Name = "Shoes", SortOrder = 3, IsActive = true },
+            new Subcategory { SubcategoryId = 4, CategoryId = 2, Slug = "eyewear", Name = "Eyewear", SortOrder = 4, IsActive = true },
+            new Subcategory { SubcategoryId = 5, CategoryId = 1, Slug = "shirts-tees", Name = "Shirts & Tees", SortOrder = 1, IsActive = true },
+            new Subcategory { SubcategoryId = 6, CategoryId = 1, Slug = "footwear", Name = "Footwear", SortOrder = 2, IsActive = true },
+            new Subcategory { SubcategoryId = 7, CategoryId = 1, Slug = "watches", Name = "Watches", SortOrder = 3, IsActive = true },
+            new Subcategory { SubcategoryId = 8, CategoryId = 11, Slug = "handbags", Name = "Handbags", SortOrder = 1, IsActive = true },
+            new Subcategory { SubcategoryId = 9, CategoryId = 11, Slug = "backpacks", Name = "Backpacks", SortOrder = 2, IsActive = true },
+            new Subcategory { SubcategoryId = 10, CategoryId = 9, Slug = "earrings", Name = "Earrings", SortOrder = 1, IsActive = true }
         );
+
+        modelBuilder.Entity<Collection>().HasData(
+            new Collection { CollectionId = 1, Slug = "bestsellers", Name = "Bestsellers", Icon = "star-outline", SortOrder = 1, IsActive = true },
+            new Collection { CollectionId = 2, Slug = "luxe", Name = "Luxe", Icon = "diamond-stone", SortOrder = 2, IsActive = true },
+            new Collection { CollectionId = 3, Slug = "clearance", Name = "Clearance", Icon = "tag-outline", SortOrder = 3, IsActive = true },
+            new Collection { CollectionId = 4, Slug = "seasonal", Name = "Seasonal", Icon = "gift-outline", SortOrder = 4, IsActive = true },
+            new Collection { CollectionId = 5, Slug = "rent", Name = "Rent", Icon = "calendar-clock-outline", SortOrder = 5, IsActive = true }
+        );
+
+        // Two demo sale campaigns so products on sale can show a real
+        // countdown. Fixed future dates (not DateTime.UtcNow) because
+        // HasData values are baked into the migration at generation time.
+        modelBuilder.Entity<Sale>().HasData(
+            new Sale { SaleId = 1, StoreId = 1, Name = "Flash Sale", StartDate = seedDate, EndDate = new DateTime(2026, 10, 17, 20, 0, 0, DateTimeKind.Utc), IsActive = true },
+            new Sale { SaleId = 2, StoreId = 1, Name = "Weekend Deals", StartDate = seedDate, EndDate = new DateTime(2026, 10, 20, 20, 0, 0, DateTimeKind.Utc), IsActive = true }
+        );
+
+        modelBuilder.Entity<Product>().HasData(
+            new Product { ProductId = 1, StoreId = 1, SaleId = 1, Title = "Black Women's Gown", Description = "An elegant floor-length gown in black, finished with a tailored silhouette for evening occasions.", CategoryId = 2, SubcategoryId = 1, OriginalPrice = 129.99m, SalePrice = 116.99m, DiscountPercentage = 10, Rating = 3.64, IsRentable = true, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 2, StoreId = 1, SaleId = 1, Title = "Corset Leather With Skirt", Description = "A structured leather corset paired with a matching skirt for a bold, fitted look.", CategoryId = 2, SubcategoryId = 2, OriginalPrice = 89.99m, SalePrice = 75.59m, DiscountPercentage = 16, Rating = 3.05, IsRentable = true, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 3, StoreId = 1, SaleId = 1, Title = "Corset With Black Skirt", Description = "A classic black corset top with a coordinating skirt, cinched at the waist.", CategoryId = 2, SubcategoryId = 2, OriginalPrice = 79.99m, SalePrice = 67.99m, DiscountPercentage = 15, Rating = 4.52, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 4, StoreId = 1, SaleId = 1, Title = "Dress Pea", Description = "A soft pea-green dress with a relaxed fit, perfect for everyday wear.", CategoryId = 2, SubcategoryId = 1, OriginalPrice = 49.99m, SalePrice = 40.99m, DiscountPercentage = 18, Rating = 4.88, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 5, StoreId = 1, SaleId = 1, Title = "Marni Red & Black Suit", Description = "A striking red and black two-piece suit with sharp tailoring.", CategoryId = 2, SubcategoryId = 2, OriginalPrice = 179.99m, SalePrice = 145.79m, DiscountPercentage = 19, Rating = 4.48, IsRentable = true, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 6, StoreId = 1, SaleId = 1, Title = "Blue Frock", Description = "A lightweight blue frock with a flattering A-line cut.", CategoryId = 2, SubcategoryId = 1, OriginalPrice = 29.99m, SalePrice = 26.39m, DiscountPercentage = 12, Rating = 4.17, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 7, StoreId = 1, SaleId = 1, Title = "Girl Summer Dress", Description = "A breezy summer dress in a light fabric, ideal for warm days.", CategoryId = 2, SubcategoryId = 1, OriginalPrice = 19.99m, SalePrice = 16.19m, DiscountPercentage = 19, Rating = 4.77, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 8, StoreId = 1, SaleId = 1, Title = "Gray Dress", Description = "A versatile grey dress that moves easily from day to evening.", CategoryId = 2, SubcategoryId = 1, OriginalPrice = 34.99m, SalePrice = 30.09m, DiscountPercentage = 14, Rating = 2.72, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 9, StoreId = 1, SaleId = 1, Title = "Short Frock", Description = "A playful short frock with a fitted bodice and flared hem.", CategoryId = 2, SubcategoryId = 1, OriginalPrice = 24.99m, SalePrice = 21.74m, DiscountPercentage = 13, Rating = 3.23, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 10, StoreId = 1, SaleId = 1, Title = "Tartan Dress", Description = "A tartan-print dress with a nipped waist and classic collar.", CategoryId = 2, SubcategoryId = 1, OriginalPrice = 39.99m, SalePrice = 34.79m, DiscountPercentage = 13, Rating = 4.05, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 11, StoreId = 1, SaleId = 1, Title = "Black & Brown Slipper", Description = "Soft slip-on slippers in a black and brown colourway.", CategoryId = 2, SubcategoryId = 3, OriginalPrice = 19.99m, SalePrice = 19.39m, DiscountPercentage = 3, Rating = 2.53, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 12, StoreId = 1, SaleId = 1, Title = "Calvin Klein Heel Shoes", Description = "Pointed-toe heels from Calvin Klein with a sleek finish.", CategoryId = 2, SubcategoryId = 3, OriginalPrice = 79.99m, SalePrice = 77.59m, DiscountPercentage = 3, Rating = 4.92, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 13, StoreId = 1, SaleId = 1, Title = "Golden Shoes Woman", Description = "Metallic gold heels designed to catch the light at any event.", CategoryId = 2, SubcategoryId = 3, OriginalPrice = 49.99m, SalePrice = 42.99m, DiscountPercentage = 14, Rating = 3.26, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 14, StoreId = 1, SaleId = 1, Title = "Pampi Shoes", Description = "Comfortable everyday flats with a cushioned footbed.", CategoryId = 2, SubcategoryId = 3, OriginalPrice = 29.99m, SalePrice = 25.79m, DiscountPercentage = 14, Rating = 3.05, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 15, StoreId = 1, SaleId = 1, Title = "Red Shoes", Description = "Statement red shoes with a rounded toe and block heel.", CategoryId = 2, SubcategoryId = 3, OriginalPrice = 34.99m, SalePrice = 28.69m, DiscountPercentage = 18, Rating = 3.25, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 16, StoreId = 1, SaleId = 1, Title = "Blue Women's Handbag", Description = "A structured blue handbag with a top handle and adjustable strap.", CategoryId = 11, SubcategoryId = 8, OriginalPrice = 49.99m, SalePrice = 40.99m, DiscountPercentage = 18, Rating = 2.92, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 17, StoreId = 1, SaleId = 1, Title = "Heshe Women's Leather Bag", Description = "A genuine leather handbag from Heshe with a timeless silhouette.", CategoryId = 11, SubcategoryId = 8, OriginalPrice = 129.99m, SalePrice = 124.79m, DiscountPercentage = 4, Rating = 4.92, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 18, StoreId = 1, SaleId = 1, Title = "Prada Women Bag", Description = "A premium Prada handbag crafted for everyday luxury.", CategoryId = 11, SubcategoryId = 8, OriginalPrice = 599.99m, SalePrice = 515.99m, DiscountPercentage = 14, Rating = 2.71, IsRentable = true, IsLuxe = true, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 19, StoreId = 1, SaleId = 1, Title = "White Faux Leather Backpack", Description = "A white faux-leather backpack with padded straps for daily use.", CategoryId = 11, SubcategoryId = 9, OriginalPrice = 39.99m, SalePrice = 33.99m, DiscountPercentage = 15, Rating = 3.36, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 20, StoreId = 1, SaleId = 1, Title = "Women Handbag Black", Description = "A classic black handbag with a roomy interior and secure zip closure.", CategoryId = 11, SubcategoryId = 8, OriginalPrice = 59.99m, SalePrice = 52.79m, DiscountPercentage = 12, Rating = 2.89, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 21, StoreId = 1, SaleId = 1, Title = "Green Crystal Earring", Description = "Crystal drop earrings in a rich emerald green.", CategoryId = 9, SubcategoryId = 10, OriginalPrice = 29.99m, SalePrice = 25.49m, DiscountPercentage = 15, Rating = 3.96, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 22, StoreId = 1, SaleId = 1, Title = "Green Oval Earring", Description = "Oval-cut green stone earrings with a delicate gold-tone setting.", CategoryId = 9, SubcategoryId = 10, OriginalPrice = 24.99m, SalePrice = 21.24m, DiscountPercentage = 15, Rating = 3.57, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 23, StoreId = 1, SaleId = 2, Title = "Tropical Earring", Description = "Statement earrings with a tropical-inspired design.", CategoryId = 9, SubcategoryId = 10, OriginalPrice = 19.99m, SalePrice = 19.79m, DiscountPercentage = 1, Rating = 4.4, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 24, StoreId = 1, SaleId = 2, Title = "Black Sun Glasses", Description = "Classic black sunglasses with UV-protective lenses.", CategoryId = 2, SubcategoryId = 4, OriginalPrice = 29.99m, SalePrice = 28.49m, DiscountPercentage = 5, Rating = 4.41, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 25, StoreId = 1, SaleId = 2, Title = "Classic Sun Glasses", Description = "Timeless sunglasses with a rounded frame.", CategoryId = 2, SubcategoryId = 4, OriginalPrice = 24.99m, SalePrice = 23.74m, DiscountPercentage = 5, Rating = 3.86, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 26, StoreId = 1, SaleId = 2, Title = "Green and Black Glasses", Description = "Two-tone sunglasses in green and black with a modern frame.", CategoryId = 2, SubcategoryId = 4, OriginalPrice = 34.99m, SalePrice = 34.64m, DiscountPercentage = 1, Rating = 4.55, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 27, StoreId = 1, SaleId = 2, Title = "Party Glasses", Description = "Statement sunglasses with a bold frame, made for standing out.", CategoryId = 2, SubcategoryId = 4, OriginalPrice = 19.99m, SalePrice = 17.79m, DiscountPercentage = 11, Rating = 2.79, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 28, StoreId = 1, SaleId = 2, Title = "Sunglasses", Description = "Everyday sunglasses with a lightweight frame.", CategoryId = 2, SubcategoryId = 4, OriginalPrice = 22.99m, SalePrice = 22.53m, DiscountPercentage = 2, Rating = 3.02, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 29, StoreId = 1, SaleId = 2, Title = "Blue & Black Check Shirt", Description = "A checked shirt in blue and black, cut for a relaxed everyday fit.", CategoryId = 1, SubcategoryId = 5, OriginalPrice = 29.99m, SalePrice = 25.49m, DiscountPercentage = 15, Rating = 3.64, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 30, StoreId = 1, SaleId = 2, Title = "Gigabyte Aorus Men Tshirt", Description = "A graphic Aorus-branded t-shirt in soft cotton.", CategoryId = 1, SubcategoryId = 5, OriginalPrice = 24.99m, SalePrice = 24.74m, DiscountPercentage = 1, Rating = 3.18, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 31, StoreId = 1, SaleId = 2, Title = "Man Plaid Shirt", Description = "A classic plaid shirt with a button-down collar.", CategoryId = 1, SubcategoryId = 5, OriginalPrice = 34.99m, SalePrice = 27.99m, DiscountPercentage = 20, Rating = 3.46, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 32, StoreId = 1, SaleId = 2, Title = "Man Short Sleeve Shirt", Description = "A lightweight short-sleeve shirt for warm-weather wear.", CategoryId = 1, SubcategoryId = 5, OriginalPrice = 19.99m, SalePrice = 18.59m, DiscountPercentage = 7, Rating = 2.9, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 33, StoreId = 1, SaleId = 2, Title = "Men Check Shirt", Description = "A checked button-up shirt with a tailored fit.", CategoryId = 1, SubcategoryId = 5, OriginalPrice = 27.99m, SalePrice = 24.91m, DiscountPercentage = 11, Rating = 2.72, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 34, StoreId = 1, SaleId = 2, Title = "Nike Air Jordan 1 Red And Black", Description = "Iconic Air Jordan 1 sneakers in a red and black colourway.", CategoryId = 1, SubcategoryId = 6, OriginalPrice = 149.99m, SalePrice = 143.99m, DiscountPercentage = 4, Rating = 4.77, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 35, StoreId = 1, SaleId = 2, Title = "Nike Baseball Cleats", Description = "Performance baseball cleats built for grip and speed.", CategoryId = 1, SubcategoryId = 6, OriginalPrice = 79.99m, SalePrice = 65.59m, DiscountPercentage = 18, Rating = 3.88, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 36, StoreId = 1, SaleId = 2, Title = "Puma Future Rider Trainers", Description = "Retro-styled Puma trainers with a cushioned sole.", CategoryId = 1, SubcategoryId = 6, OriginalPrice = 89.99m, SalePrice = 86.39m, DiscountPercentage = 4, Rating = 4.9, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 37, StoreId = 1, SaleId = 2, Title = "Sports Sneakers Off White & Red", Description = "Lightweight sneakers in off-white and red, built for everyday training.", CategoryId = 1, SubcategoryId = 6, OriginalPrice = 119.99m, SalePrice = 113.99m, DiscountPercentage = 5, Rating = 4.77, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 38, StoreId = 1, Title = "Sports Sneakers Off White Red", Description = "A low-top sneaker in off-white with red accents.", CategoryId = 1, SubcategoryId = 6, OriginalPrice = 109.99m, SalePrice = null, DiscountPercentage = null, Rating = 4.69, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 39, StoreId = 1, SaleId = 2, Title = "Brown Leather Belt Watch", Description = "A classic watch with a brown leather strap and minimalist dial.", CategoryId = 1, SubcategoryId = 7, OriginalPrice = 89.99m, SalePrice = 84.59m, DiscountPercentage = 6, Rating = 4.19, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 40, StoreId = 1, SaleId = 2, Title = "Longines Master Collection", Description = "A Longines Master Collection watch with a refined, understated face.", CategoryId = 1, SubcategoryId = 7, OriginalPrice = 1499.99m, SalePrice = 1244.99m, DiscountPercentage = 17, Rating = 3.87, IsRentable = true, IsLuxe = true, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 41, StoreId = 1, SaleId = 2, Title = "Rolex Cellini Date Black Dial", Description = "A Rolex Cellini with a black dial and date function.", CategoryId = 1, SubcategoryId = 7, OriginalPrice = 8999.99m, SalePrice = 8189.99m, DiscountPercentage = 9, Rating = 4.97, IsLuxe = true, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 42, StoreId = 1, SaleId = 2, Title = "Rolex Cellini Moonphase", Description = "A Rolex Cellini Moonphase with an intricate dial complication.", CategoryId = 1, SubcategoryId = 7, OriginalPrice = 12999.99m, SalePrice = 10659.99m, DiscountPercentage = 18, Rating = 2.58, IsLuxe = true, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 43, StoreId = 1, SaleId = 2, Title = "Rolex Datejust", Description = "A Rolex Datejust, the brand's most recognisable classic.", CategoryId = 1, SubcategoryId = 7, OriginalPrice = 10999.99m, SalePrice = 10559.99m, DiscountPercentage = 4, Rating = 3.66, IsLuxe = true, IsActive = true, CreatedAt = seedDate },
+            new Product { ProductId = 44, StoreId = 1, SaleId = 2, Title = "Rolex Submariner Watch", Description = "A Rolex Submariner built for durability and timeless style.", CategoryId = 1, SubcategoryId = 7, OriginalPrice = 13999.99m, SalePrice = 13299.99m, DiscountPercentage = 5, Rating = 2.69, IsLuxe = true, IsActive = true, CreatedAt = seedDate }
+        );
+
+        // Per-size stock, generated from a fixed table rather than typed out
+        // by hand — same placeholder-data spirit as the rest of this seed.
+        // Quantity is a flat default (no real inventory data exists yet) and
+        // decreases via IProductStockService when a size is purchased.
+        var clothingSizeList = new[] { "XS", "S", "M", "L", "XL" };
+        var womensShoeSizeList = new[] { "6", "7", "8", "9", "10", "11" };
+        var mensShoeSizeList = new[] { "6", "7", "8", "9", "10", "11", "12" };
+        var oneSizeList = new[] { "One Size" };
+
+        var productSizeGroups = new (long ProductId, string[] Sizes)[]
+        {
+            (1, clothingSizeList), (2, clothingSizeList), (3, clothingSizeList), (4, clothingSizeList),
+            (5, clothingSizeList), (6, clothingSizeList), (7, clothingSizeList), (8, clothingSizeList),
+            (9, clothingSizeList), (10, clothingSizeList),
+            (11, womensShoeSizeList), (12, womensShoeSizeList), (13, womensShoeSizeList),
+            (14, womensShoeSizeList), (15, womensShoeSizeList),
+            (16, oneSizeList), (17, oneSizeList), (18, oneSizeList), (19, oneSizeList), (20, oneSizeList),
+            (21, oneSizeList), (22, oneSizeList), (23, oneSizeList),
+            (24, oneSizeList), (25, oneSizeList), (26, oneSizeList), (27, oneSizeList), (28, oneSizeList),
+            (29, clothingSizeList), (30, clothingSizeList), (31, clothingSizeList),
+            (32, clothingSizeList), (33, clothingSizeList),
+            (34, mensShoeSizeList), (35, mensShoeSizeList), (36, mensShoeSizeList),
+            (37, mensShoeSizeList), (38, mensShoeSizeList),
+            (39, oneSizeList), (40, oneSizeList), (41, oneSizeList),
+            (42, oneSizeList), (43, oneSizeList), (44, oneSizeList),
+        };
+
+        const int defaultStockPerSize = 20;
+        var nextProductSizeId = 0L;
+        var productSizes = productSizeGroups
+            .SelectMany(g => g.Sizes.Select(size => new ProductSize
+            {
+                ProductSizeId = ++nextProductSizeId,
+                ProductId = g.ProductId,
+                Size = size,
+                Quantity = defaultStockPerSize,
+            }))
+            .ToArray();
+
+        modelBuilder.Entity<ProductSize>().HasData(productSizes);
 
         modelBuilder.Entity<ProductImage>().HasData(
             new ProductImage { ProductImageId = 1, ProductId = 1, SortOrder = 0, ImageUrl = "https://cdn.dummyjson.com/product-images/womens-dresses/black-women's-gown/thumbnail.webp" },

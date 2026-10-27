@@ -6,10 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Kairos.Infrastructure.Search;
 
-public class SearchService(
-    KairosDbContext dbContext,
-    OllamaQueryInterpreter queryInterpreter,
-    TypesenseClient typesenseClient) : ISearchService
+public class SearchService(KairosDbContext dbContext, LuceneSearchIndex searchIndex) : ISearchService
 {
     public async Task<SearchResultDto> SearchAsync(string query, CancellationToken cancellationToken = default)
     {
@@ -19,47 +16,24 @@ public class SearchService(
             return new SearchResultDto { Products = Array.Empty<ProductDto>() };
         }
 
-        var categories = await dbContext.Categories.Where(c => c.IsActive).ToListAsync(cancellationToken);
-        var filters = await queryInterpreter.InterpretAsync(trimmedQuery, categories, cancellationToken);
-        var keywordText = filters?.Keywords.Count > 0 ? string.Join(' ', filters.Keywords) : trimmedQuery;
+        var keywords = trimmedQuery
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToList();
 
-        List<Product> matchedProducts;
-        try
-        {
-            var orderedIds = await typesenseClient.SearchAsync(keywordText, filters, cancellationToken);
-
-            // The AI's category/price guess can be wrong (it doesn't actually
-            // know our catalog — e.g. it may not know "Cellini" is a Rolex
-            // watch line and guess "jewellery" instead), which would
-            // otherwise silently filter out a real title match. If the
-            // filtered search comes back empty, retry on keywords alone
-            // before giving up.
-            if (orderedIds.Count == 0 && filters is not null)
-            {
-                orderedIds = await typesenseClient.SearchAsync(keywordText, null, cancellationToken);
-            }
-
-            matchedProducts = await LoadProductsInOrderAsync(orderedIds, cancellationToken);
-        }
-        catch
-        {
-            // Typesense unreachable/not indexed yet — fall back to a plain
-            // in-memory keyword match so search still works.
-            matchedProducts = await FallbackKeywordSearchAsync(trimmedQuery, filters, cancellationToken);
-        }
+        var orderedIds = searchIndex.Search(keywords);
+        var products = await LoadProductsInOrderAsync(orderedIds, cancellationToken);
+        var correctedQuery = DeriveCorrectedQuery(keywords, products);
 
         return new SearchResultDto
         {
-            Interpretation = filters?.Interpretation ?? $"Results for \"{trimmedQuery}\"",
-            Products = matchedProducts.Select(MapToDto).ToList(),
+            Interpretation = correctedQuery is not null
+                ? $"Showing results for \"{correctedQuery}\""
+                : $"Results for \"{trimmedQuery}\"",
+            CorrectedQuery = correctedQuery,
+            Products = products.Select(MapToDto).ToList(),
         };
     }
 
-    // No LLM call here on purpose — this runs on every keystroke, so it has
-    // to be fast. Typesense's own typo-tolerant prefix search is enough for
-    // a live suggestions dropdown. Every suggestion is grounded in real
-    // catalog data (an actual category name or an actual product title) —
-    // nothing here is invented.
     public async Task<IReadOnlyList<SearchSuggestionDto>> SuggestAsync(string query, CancellationToken cancellationToken = default)
     {
         var trimmedQuery = query.Trim();
@@ -75,23 +49,12 @@ public class SearchService(
             .Select(c => c.Name)
             .ToListAsync(cancellationToken);
 
-        List<Product> productMatches;
-        try
-        {
-            var orderedIds = await typesenseClient.SearchAsync(trimmedQuery, null, cancellationToken);
-            productMatches = await LoadProductsInOrderAsync(orderedIds.Take(6).ToList(), cancellationToken);
-        }
-        catch
-        {
-            productMatches = await dbContext.Products
-                .Include(p => p.Store)
-                .Include(p => p.Category)
-                .Include(p => p.Images)
-                .Where(p => p.IsActive && p.Title.Contains(trimmedQuery))
-                .OrderByDescending(p => p.Rating)
-                .Take(6)
-                .ToListAsync(cancellationToken);
-        }
+        var productMatches = await dbContext.Products
+            .Where(p => p.IsActive && p.Title.Contains(trimmedQuery))
+            .OrderByDescending(p => p.Rating)
+            .Take(6)
+            .Select(p => p.Title)
+            .ToListAsync(cancellationToken);
 
         var suggestions = new List<SearchSuggestionDto>();
         var seenText = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -104,98 +67,108 @@ public class SearchService(
             }
         }
 
-        foreach (var product in productMatches)
+        foreach (var title in productMatches)
         {
             if (suggestions.Count >= 8)
             {
                 break;
             }
-            if (seenText.Add(product.Title))
+            if (seenText.Add(title))
             {
-                suggestions.Add(new SearchSuggestionDto { Text = product.Title, Type = "product" });
+                suggestions.Add(new SearchSuggestionDto { Text = title, Type = "product" });
             }
         }
 
         return suggestions;
     }
 
-    private async Task<List<Product>> LoadProductsInOrderAsync(List<long> orderedIds, CancellationToken cancellationToken)
+    private async Task<List<Product>> LoadProductsInOrderAsync(IReadOnlyList<long> orderedIds, CancellationToken cancellationToken)
     {
         var byId = await dbContext.Products
             .Include(p => p.Store)
             .Include(p => p.Category)
+            .Include(p => p.Subcategory)
             .Include(p => p.Images)
+            .Include(p => p.Sale)
+            .Include(p => p.Sizes)
             .Where(p => p.IsActive && orderedIds.Contains(p.ProductId))
+            .AsSplitQuery()
             .ToDictionaryAsync(p => p.ProductId, cancellationToken);
 
         return orderedIds.Where(byId.ContainsKey).Select(id => byId[id]).ToList();
     }
 
-    private async Task<List<Product>> FallbackKeywordSearchAsync(
-        string trimmedQuery,
-        SearchFilters? filters,
-        CancellationToken cancellationToken)
+    // Only ever suggests a word that actually appears in the products being
+    // returned, so the display text can never disagree with the results —
+    // unlike a separate spell-checker pass, which can "correct" to a word
+    // that has nothing to do with what was actually matched.
+    private static string? DeriveCorrectedQuery(List<string> keywords, List<Product> products)
     {
-        var keywords = filters?.Keywords.Count > 0
-            ? filters.Keywords
-            : trimmedQuery
-                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .ToList();
-
-        var productsQuery = dbContext.Products
-            .Include(p => p.Store)
-            .Include(p => p.Category)
-            .Include(p => p.Images)
-            .Where(p => p.IsActive);
-
-        if (!string.IsNullOrWhiteSpace(filters?.CategorySlug))
+        if (products.Count == 0)
         {
-            productsQuery = productsQuery.Where(p => p.Category.Slug == filters.CategorySlug);
+            return null;
         }
 
-        if (filters?.MinPrice is { } minPrice)
+        var resultWords = products
+            .SelectMany(p => $"{p.Title} {p.Category.Name}".Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            .Select(w => w.Trim(',', '.', '&', '\'').ToLowerInvariant())
+            .Where(w => w.Length > 0)
+            .Distinct()
+            .ToList();
+
+        var changed = false;
+        var corrected = new List<string>(keywords.Count);
+
+        foreach (var keyword in keywords)
         {
-            productsQuery = productsQuery.Where(p => (p.SalePrice ?? p.OriginalPrice) >= minPrice);
-        }
+            var lower = keyword.ToLowerInvariant();
 
-        if (filters?.MaxPrice is { } maxPrice)
-        {
-            productsQuery = productsQuery.Where(p => (p.SalePrice ?? p.OriginalPrice) <= maxPrice);
-        }
-
-        if (filters?.OnSaleOnly == true)
-        {
-            productsQuery = productsQuery.Where(p => p.SalePrice != null && p.SalePrice < p.OriginalPrice);
-        }
-
-        var candidates = await productsQuery.ToListAsync(cancellationToken);
-
-        if (keywords.Count > 0)
-        {
-            var filtered = candidates
-                .Where(p => keywords.Any(k => p.Title.Contains(k, StringComparison.OrdinalIgnoreCase)))
-                .ToList();
-
-            // Same "AI's filter may be wrong" safety net as the Typesense
-            // path: if the category/price filters plus keywords produced
-            // nothing, retry on keywords alone against the full catalog.
-            if (filtered.Count == 0 && filters is not null)
+            if (resultWords.Any(w => w.Contains(lower) || lower.Contains(w)))
             {
-                var allActive = await dbContext.Products
-                    .Include(p => p.Store)
-                    .Include(p => p.Category)
-                    .Include(p => p.Images)
-                    .Where(p => p.IsActive)
-                    .ToListAsync(cancellationToken);
-                filtered = allActive
-                    .Where(p => keywords.Any(k => p.Title.Contains(k, StringComparison.OrdinalIgnoreCase)))
-                    .ToList();
+                corrected.Add(keyword);
+                continue;
             }
 
-            candidates = filtered;
+            var maxDistance = lower.Length <= 4 ? 1 : lower.Length <= 7 ? 2 : 3;
+            var best = resultWords
+                .Select(w => (word: w, distance: LevenshteinDistance(lower, w)))
+                .Where(m => m.distance <= maxDistance)
+                .OrderBy(m => m.distance)
+                .FirstOrDefault();
+
+            if (best.word is not null)
+            {
+                corrected.Add(best.word);
+                changed = true;
+            }
+            else
+            {
+                corrected.Add(keyword);
+            }
         }
 
-        return candidates.OrderByDescending(p => p.Rating).Take(30).ToList();
+        return changed ? string.Join(' ', corrected) : null;
+    }
+
+    private static int LevenshteinDistance(string a, string b)
+    {
+        var lenA = a.Length;
+        var lenB = b.Length;
+        var dp = new int[lenA + 1, lenB + 1];
+
+        for (var i = 0; i <= lenA; i++) dp[i, 0] = i;
+        for (var j = 0; j <= lenB; j++) dp[0, j] = j;
+
+        for (var i = 1; i <= lenA; i++)
+        {
+            for (var j = 1; j <= lenB; j++)
+            {
+                var cost = a[i - 1] == b[j - 1] ? 0 : 1;
+                dp[i, j] = Math.Min(Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1), dp[i - 1, j - 1] + cost);
+            }
+        }
+
+        return dp[lenA, lenB];
     }
 
     private static ProductDto MapToDto(Product p) => new()
@@ -206,11 +179,17 @@ public class SearchService(
         CategoryId = p.CategoryId,
         CategorySlug = p.Category.Slug,
         CategoryName = p.Category.Name,
+        SubcategorySlug = p.Subcategory?.Slug,
+        SubcategoryName = p.Subcategory?.Name,
+        Sizes = p.Sizes.Select(s => new ProductSizeDto { Size = s.Size, Quantity = s.Quantity, UnitsSold = s.UnitsSold }).ToList(),
         OriginalPrice = p.OriginalPrice,
         SalePrice = p.SalePrice,
         DiscountPercentage = p.DiscountPercentage,
         IsOnSale = p.SalePrice != null && p.SalePrice < p.OriginalPrice,
+        SaleEndsAt = p.Sale != null ? p.Sale.EndDate : null,
         Rating = p.Rating,
+        IsRentable = p.IsRentable,
+        IsLuxe = p.IsLuxe,
         Images = p.Images.OrderBy(i => i.SortOrder).Select(i => i.ImageUrl).ToList(),
         StoreId = p.StoreId,
         StoreName = p.Store.Name,

@@ -13,23 +13,21 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { ProductCard } from '../components/ProductCard';
+import { KairosWordmark } from '../components/KairosWordmark';
+import { SubcategoryBanner } from '../components/SubcategoryBanner';
+import { TrendingBanner } from '../components/TrendingBanner';
+import { SearchFilterBar } from '../components/SearchFilterBar';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
 import { useScaleFont } from '../theme/responsive';
 import { fetchProducts, Product } from '../api/products';
 import { fetchCategories, Category } from '../api/categories';
 import { fetchSearch, fetchSuggestions, SearchSuggestion } from '../api/search';
-import { addRecentSearch, getRecentSearches } from '../api/searchHistory';
+import { addRecentSearch, clearRecentSearches, getRecentSearches, removeRecentSearch } from '../api/searchHistory';
 
 const GRID_GAP = 6;
 const SCREEN_PADDING = 16;
 const DOT_COLORS = ['#e8c9a0', '#ddaba8', '#c6a3c9', '#a3b9cf', '#f5d78e', '#9fd8c9'];
-
-const PRICE_BRACKETS: { label: string; min?: number; max?: number }[] = [
-  { label: 'Under R500', max: 500 },
-  { label: 'R500–R2000', min: 500, max: 2000 },
-  { label: 'Over R2000', min: 2000 },
-];
 
 type Props = {
   onClose: () => void;
@@ -51,10 +49,14 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
   const [isSearching, setIsSearching] = useState(false);
   const [results, setResults] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [correctedQuery, setCorrectedQuery] = useState<string | null>(null);
 
-  const [filterCategory, setFilterCategory] = useState<string | null>(null);
-  const [filterPriceLabel, setFilterPriceLabel] = useState<string | null>(null);
-  const [filterOnSale, setFilterOnSale] = useState(false);
+  const [filterCategories, setFilterCategories] = useState<string[]>([]);
+  const [filterSubcategories, setFilterSubcategories] = useState<string[]>([]);
+  const [filterSize, setFilterSize] = useState<string | null>(null);
+  const [filterPriceCondition, setFilterPriceCondition] = useState<'under' | 'over' | null>(null);
+  const [filterPriceValue, setFilterPriceValue] = useState('');
+  const [filterSpecial, setFilterSpecial] = useState<'luxe' | 'rent' | null>(null);
 
   useEffect(() => {
     getRecentSearches().then(setRecentSearches);
@@ -90,25 +92,40 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
     setHasSearched(true);
     setIsSearching(true);
     setError(null);
-    setFilterCategory(null);
-    setFilterPriceLabel(null);
-    setFilterOnSale(false);
+    setFilterCategories([]);
+    setFilterSubcategories([]);
+    setFilterSize(null);
+    setFilterPriceCondition(null);
+    setFilterPriceValue('');
+    setFilterSpecial(null);
 
+    let correctedTerm: string | null = null;
     try {
       const result = await fetchSearch(trimmed);
       setResults(result.products);
+      correctedTerm = result.correctedQuery;
+      setCorrectedQuery(result.correctedQuery ? result.interpretation : null);
     } catch {
       setError('Search failed. Please try again.');
     } finally {
       setIsSearching(false);
     }
 
-    addRecentSearch(trimmed).then(setRecentSearches);
+    addRecentSearch(correctedTerm ?? trimmed).then(setRecentSearches);
   }, []);
 
   const handleClear = () => {
     setQueryText('');
     setHasSearched(false);
+    setCorrectedQuery(null);
+  };
+
+  const handleRemoveRecent = (term: string) => {
+    removeRecentSearch(term).then(setRecentSearches);
+  };
+
+  const handleClearAllRecent = () => {
+    clearRecentSearches().then(setRecentSearches);
   };
 
   const isTyping = !hasSearched && queryText.trim().length >= 2;
@@ -120,26 +137,71 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
     return Array.from(seen, ([slug, name]) => ({ slug, name }));
   }, [results]);
 
+  const resultSubcategories = useMemo(() => {
+    const seen = new Map<string, string>();
+    results.forEach((p) => {
+      if (p.subcategorySlug && p.subcategoryName) seen.set(p.subcategorySlug, p.subcategoryName);
+    });
+    return Array.from(seen, ([slug, name]) => ({ slug, name }));
+  }, [results]);
+
+  const resultSizes = useMemo(() => {
+    const seen = new Set<string>();
+    results.forEach((p) => p.sizes.forEach((s) => s.quantity > 0 && seen.add(s.size)));
+    return Array.from(seen);
+  }, [results]);
+
   const filteredResults = useMemo(() => {
-    const bracket = PRICE_BRACKETS.find((b) => b.label === filterPriceLabel);
+    const priceNum = parseFloat(filterPriceValue);
+    const hasPriceFilter = filterPriceCondition !== null && !Number.isNaN(priceNum);
+
     return results.filter((p) => {
-      if (filterCategory && p.categorySlug !== filterCategory) return false;
-      if (filterOnSale && !p.isOnSale) return false;
-      if (bracket) {
+      if (filterCategories.length > 0 && !filterCategories.includes(p.categorySlug)) return false;
+      if (
+        filterSubcategories.length > 0 &&
+        (!p.subcategorySlug || !filterSubcategories.includes(p.subcategorySlug))
+      )
+        return false;
+      if (filterSize && !p.sizes.some((s) => s.size === filterSize && s.quantity > 0)) return false;
+      if (hasPriceFilter) {
         const price = p.salePrice ?? p.originalPrice;
-        if (bracket.min != null && price < bracket.min) return false;
-        if (bracket.max != null && price > bracket.max) return false;
+        if (filterPriceCondition === 'under' && price > priceNum) return false;
+        if (filterPriceCondition === 'over' && price < priceNum) return false;
       }
+      if (filterSpecial === 'luxe' && !p.isLuxe) return false;
+      if (filterSpecial === 'rent' && !p.isRentable) return false;
       return true;
     });
-  }, [results, filterCategory, filterPriceLabel, filterOnSale]);
+  }, [
+    results,
+    filterCategories,
+    filterSubcategories,
+    filterSize,
+    filterPriceCondition,
+    filterPriceValue,
+    filterSpecial,
+  ]);
 
   return (
     <View style={styles.screen}>
       <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        <Pressable hitSlop={10} onPress={onClose} style={styles.backButton}>
-          <MaterialCommunityIcons name="arrow-left" size={scaleFont(22)} color={colors.text} />
-        </Pressable>
+        <View style={styles.headerTopRow}>
+          <Pressable hitSlop={10} onPress={onClose} style={styles.backButton}>
+            <MaterialCommunityIcons name="arrow-left" size={scaleFont(22)} color={colors.text} />
+          </Pressable>
+          <KairosWordmark fontSize={scaleFont(16)} />
+          <View style={styles.headerIconsRow}>
+            <Pressable hitSlop={10} style={styles.headerIconButton}>
+              <MaterialCommunityIcons name="heart-outline" size={scaleFont(20)} color={colors.text} />
+            </Pressable>
+            <Pressable hitSlop={10} style={styles.headerIconButton}>
+              <MaterialCommunityIcons name="shopping-outline" size={scaleFont(20)} color={colors.text} />
+            </Pressable>
+            <Pressable hitSlop={10} style={styles.headerIconButton}>
+              <MaterialCommunityIcons name="account-circle-outline" size={scaleFont(22)} color={colors.text} />
+            </Pressable>
+          </View>
+        </View>
         <View style={styles.searchBar}>
           <MaterialCommunityIcons name="magnify" size={scaleFont(18)} color={colors.muted} />
           <TextInput
@@ -211,15 +273,29 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
             <View>
               {recentSearches.length > 0 ? (
                 <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { fontSize: scaleFont(13) }]}>
-                    Recent Searches
-                  </Text>
+                  <View style={styles.sectionHeaderRow}>
+                    <Text style={[styles.sectionTitle, { fontSize: scaleFont(13) }]}>
+                      Recent Searches
+                    </Text>
+                    <Pressable hitSlop={8} onPress={handleClearAllRecent}>
+                      <Text style={[styles.clearAllText, { fontSize: scaleFont(10.5) }]}>
+                        Clear All
+                      </Text>
+                    </Pressable>
+                  </View>
                   <View style={styles.chipWrap}>
                     {recentSearches.map((term) => (
                       <Pressable key={term} style={styles.recentChip} onPress={() => runSearch(term)}>
                         <Text style={[styles.recentChipText, { fontSize: scaleFont(10.5) }]}>
                           {term}
                         </Text>
+                        <Pressable
+                          hitSlop={8}
+                          onPress={() => handleRemoveRecent(term)}
+                          style={styles.recentChipDelete}
+                        >
+                          <MaterialCommunityIcons name="close" size={scaleFont(12)} color={colors.muted} />
+                        </Pressable>
                       </Pressable>
                     ))}
                   </View>
@@ -228,7 +304,7 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
 
               {categories.length > 0 ? (
                 <View style={styles.section}>
-                  <Text style={[styles.sectionTitle, { fontSize: scaleFont(13) }]}>
+                  <Text style={[styles.sectionTitle, { fontSize: scaleFont(13), marginBottom: 12 }]}>
                     Suggested Searches
                   </Text>
                   <View style={styles.chipWrap}>
@@ -253,9 +329,10 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
                 </View>
               ) : null}
 
-              <Text style={[styles.sectionTitle, { fontSize: scaleFont(13), marginBottom: 14 }]}>
-                Trending Now
-              </Text>
+              <View style={styles.hotListRow}>
+                <KairosWordmark fontSize={scaleFont(13)} />
+                <Text style={[styles.sectionTitle, { fontSize: scaleFont(13) }]}> HOT LIST</Text>
+              </View>
             </View>
           }
         />
@@ -263,7 +340,7 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
         <View style={styles.centerFill}>
           <ActivityIndicator color={colors.dotGold} />
           <Text style={[styles.loadingText, { fontSize: scaleFont(11.5) }]}>
-            Asking Kairos AI what you mean…
+            Searching…
           </Text>
         </View>
       ) : error ? (
@@ -271,7 +348,17 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
           <Text style={[styles.errorText, { fontSize: scaleFont(12) }]}>{error}</Text>
         </View>
       ) : (
-        <FlatList
+        <View style={styles.resultsWrap}>
+          <View style={styles.fixedSubcategoryWrap}>
+            <SubcategoryBanner
+              subcategories={resultSubcategories}
+              products={results}
+              active={filterSubcategories.length === 1 ? filterSubcategories[0] : null}
+              onSelect={(slug) => setFilterSubcategories(slug ? [slug] : [])}
+            />
+          </View>
+
+          <FlatList
           key="results-grid"
           data={filteredResults}
           keyExtractor={(item) => String(item.productId)}
@@ -289,56 +376,52 @@ export function SearchScreen({ onClose, onSelectProduct }: Props) {
           )}
           ListHeaderComponent={
             <View style={styles.filterBarWrap}>
-              <FlatList
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-                contentContainerStyle={styles.filterBar}
-                data={[
-                  { key: 'sale', label: 'On Sale', active: filterOnSale },
-                  ...resultCategories.map((c) => ({
-                    key: c.slug,
-                    label: c.name,
-                    active: filterCategory === c.slug,
-                  })),
-                  ...PRICE_BRACKETS.map((b) => ({
-                    key: b.label,
-                    label: b.label,
-                    active: filterPriceLabel === b.label,
-                  })),
-                ]}
-                keyExtractor={(f) => f.key}
-                renderItem={({ item: f }) => (
-                  <Pressable
-                    style={[styles.filterChip, f.active && styles.filterChipActive]}
-                    onPress={() => {
-                      if (f.key === 'sale') {
-                        setFilterOnSale((v) => !v);
-                      } else if (resultCategories.some((c) => c.slug === f.key)) {
-                        setFilterCategory((prev) => (prev === f.key ? null : f.key));
-                      } else {
-                        setFilterPriceLabel((prev) => (prev === f.key ? null : f.key));
-                      }
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.filterChipText,
-                        { fontSize: scaleFont(11) },
-                        f.active && styles.filterChipTextActive,
-                      ]}
-                    >
-                      {f.label}
-                    </Text>
-                  </Pressable>
-                )}
+              {correctedQuery ? (
+                <Text style={[styles.correctedText, { fontSize: scaleFont(11.5) }]}>
+                  {correctedQuery}
+                </Text>
+              ) : null}
+
+              <TrendingBanner products={results} query={queryText} onPress={onSelectProduct} />
+
+              <SearchFilterBar
+                sizes={resultSizes}
+                categories={resultCategories}
+                subcategories={resultSubcategories}
+                filterSize={filterSize}
+                filterCategories={filterCategories}
+                filterSubcategories={filterSubcategories}
+                filterSpecial={filterSpecial}
+                priceCondition={filterPriceCondition}
+                priceValue={filterPriceValue}
+                onSetSize={setFilterSize}
+                onToggleCategory={(slug) =>
+                  setFilterCategories((prev) =>
+                    prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
+                  )
+                }
+                onToggleSubcategory={(slug) =>
+                  setFilterSubcategories((prev) =>
+                    prev.includes(slug) ? prev.filter((s) => s !== slug) : [...prev, slug]
+                  )
+                }
+                onClearCategoryFilters={() => {
+                  setFilterCategories([]);
+                  setFilterSubcategories([]);
+                }}
+                onSetSpecial={setFilterSpecial}
+                onSetPrice={(condition, value) => {
+                  setFilterPriceCondition(condition);
+                  setFilterPriceValue(value);
+                }}
               />
             </View>
           }
           ListEmptyComponent={
             <Text style={[styles.emptyText, { fontSize: scaleFont(12) }]}>No results found.</Text>
           }
-        />
+          />
+        </View>
       )}
     </View>
   );
@@ -350,17 +433,28 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bgTop,
   },
   header: {
+    paddingHorizontal: SCREEN_PADDING,
+    paddingBottom: 14,
+  },
+  headerTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: SCREEN_PADDING,
-    paddingBottom: 14,
+    marginBottom: 14,
   },
   backButton: {
     padding: 4,
   },
+  headerIconsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginLeft: 'auto',
+  },
+  headerIconButton: {
+    padding: 4,
+  },
   searchBar: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
@@ -376,6 +470,12 @@ const styles = StyleSheet.create({
     fontFamily: typography.regular,
     color: colors.text,
     padding: 0,
+  },
+  resultsWrap: {
+    flex: 1,
+  },
+  fixedSubcategoryWrap: {
+    paddingHorizontal: SCREEN_PADDING,
   },
   centerFill: {
     flex: 1,
@@ -406,34 +506,32 @@ const styles = StyleSheet.create({
   filterBarWrap: {
     marginBottom: 16,
   },
-  filterBar: {
-    gap: 8,
-  },
-  filterChip: {
-    borderWidth: 1,
-    borderColor: 'rgba(232, 201, 160, 0.25)',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-  },
-  filterChipActive: {
-    backgroundColor: colors.dotGold,
-    borderColor: colors.dotGold,
-  },
-  filterChipText: {
-    fontFamily: typography.medium,
-    color: colors.text,
-  },
-  filterChipTextActive: {
-    color: '#08090b',
+  correctedText: {
+    fontFamily: typography.regular,
+    color: colors.muted,
+    marginBottom: 10,
   },
   section: {
     marginBottom: 22,
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontFamily: typography.bold,
     color: colors.text,
-    marginBottom: 12,
+  },
+  hotListRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginBottom: 14,
+  },
+  clearAllText: {
+    fontFamily: typography.semiBold,
+    color: colors.dotGold,
   },
   chipWrap: {
     flexDirection: 'row',
@@ -441,6 +539,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   recentChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#fff',
@@ -451,6 +552,9 @@ const styles = StyleSheet.create({
   recentChipText: {
     fontFamily: typography.medium,
     color: '#08090b',
+  },
+  recentChipDelete: {
+    marginLeft: -2,
   },
   suggestedChip: {
     flexDirection: 'row',

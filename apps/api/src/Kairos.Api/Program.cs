@@ -29,9 +29,10 @@ builder.Services.AddScoped<IUserLoginService, UserLoginService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IUserLookupService, UserLookupService>();
 builder.Services.AddScoped<IProductQueryService, ProductQueryService>();
+builder.Services.AddScoped<IProductStockService, ProductStockService>();
 builder.Services.AddScoped<ICategoryQueryService, CategoryQueryService>();
-builder.Services.AddHttpClient<OllamaQueryInterpreter>();
-builder.Services.AddHttpClient<TypesenseClient>();
+builder.Services.AddScoped<ICollectionQueryService, CollectionQueryService>();
+builder.Services.AddSingleton<LuceneSearchIndex>();
 builder.Services.AddScoped<ISearchService, SearchService>();
 
 var jwtSection = builder.Configuration.GetSection("Jwt");
@@ -75,38 +76,12 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Sync the catalog into Typesense on boot so search has something to query.
-// If Typesense isn't reachable, SearchService falls back to keyword search,
-// so a failure here must not block startup.
+// Build the in-process Lucene search index from the current catalog on boot.
 using (var scope = app.Services.CreateScope())
 {
-    try
-    {
-        var typesenseClient = scope.ServiceProvider.GetRequiredService<TypesenseClient>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<KairosDbContext>();
-
-        await typesenseClient.EnsureCollectionAsync(CancellationToken.None);
-
-        var docs = await dbContext.Products
-            .Include(p => p.Category)
-            .Where(p => p.IsActive)
-            .Select(p => new TypesenseProductDoc
-            {
-                Id = p.ProductId.ToString(),
-                Title = p.Title,
-                CategorySlug = p.Category.Slug,
-                Price = (double)(p.SalePrice ?? p.OriginalPrice),
-                IsOnSale = p.SalePrice != null && p.SalePrice < p.OriginalPrice,
-                Rating = p.Rating,
-            })
-            .ToListAsync();
-
-        await typesenseClient.UpsertProductsAsync(docs, CancellationToken.None);
-    }
-    catch (Exception ex)
-    {
-        app.Logger.LogWarning(ex, "Could not sync products into Typesense at startup; search will fall back to keyword matching.");
-    }
+    var searchIndex = scope.ServiceProvider.GetRequiredService<LuceneSearchIndex>();
+    var dbContext = scope.ServiceProvider.GetRequiredService<KairosDbContext>();
+    await searchIndex.RebuildAsync(dbContext);
 }
 
 app.Run();

@@ -9,11 +9,14 @@ import { ForYouScreen } from './ForYouScreen';
 import { OnPromotionScreen } from './OnPromotionScreen';
 import { SearchScreen } from './SearchScreen';
 import { ProductDetailScreen } from './ProductDetailScreen';
+import { LuxeScreen } from './LuxeScreen';
+import { RentScreen } from './RentScreen';
 
 export function MainTabs() {
   const [activeTab, setActiveTab] = useState<TabKey>('home');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [openCollectionSlug, setOpenCollectionSlug] = useState<string | null>(null);
 
   if (selectedProduct) {
     return (
@@ -35,13 +38,41 @@ export function MainTabs() {
     );
   }
 
+  if (openCollectionSlug === 'luxe') {
+    return (
+      <View style={styles.root}>
+        <LuxeScreen
+          onBack={() => setOpenCollectionSlug(null)}
+          onSearchPress={() => setIsSearchOpen(true)}
+          onSelectProduct={setSelectedProduct}
+        />
+      </View>
+    );
+  }
+
+  if (openCollectionSlug === 'rent') {
+    return (
+      <View style={styles.root}>
+        <RentScreen
+          onBack={() => setOpenCollectionSlug(null)}
+          onSearchPress={() => setIsSearchOpen(true)}
+          onSelectProduct={setSelectedProduct}
+        />
+      </View>
+    );
+  }
+
   const openSearch = () => setIsSearchOpen(true);
 
   return (
     <View style={styles.root}>
       <View style={styles.content}>
         {activeTab === 'home' ? (
-          <HomeScreen onSearchPress={openSearch} onSelectProduct={setSelectedProduct} />
+          <HomeScreen
+            onSearchPress={openSearch}
+            onSelectProduct={setSelectedProduct}
+            onOpenCollection={setOpenCollectionSlug}
+          />
         ) : null}
         {activeTab === 'trending' ? (
           <TrendingScreen onSearchPress={openSearch} onSelectProduct={setSelectedProduct} />

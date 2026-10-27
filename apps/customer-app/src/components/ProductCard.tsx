@@ -13,6 +13,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Product } from '../api/products';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
+import { formatTimeLeft } from '../utils/timeLeft';
 
 type Props = {
   product: Product;
@@ -25,6 +26,7 @@ export function ProductCard({ product, scaleFont, width, onPress }: Props) {
   const [activeImage, setActiveImage] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const images = product.images.length > 0 ? product.images : [undefined];
+  const timeLeft = product.isOnSale ? formatTimeLeft(product.saleEndsAt) : null;
 
   const handleScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const index = Math.round(e.nativeEvent.contentOffset.x / width);
@@ -59,6 +61,13 @@ export function ProductCard({ product, scaleFont, width, onPress }: Props) {
             <Text style={[styles.saleBadgeText, { fontSize: scaleFont(9) }]}>
               -{product.discountPercentage}%
             </Text>
+          </View>
+        ) : null}
+
+        {timeLeft ? (
+          <View style={styles.timeLeftBadge}>
+            <MaterialCommunityIcons name="clock-outline" size={scaleFont(9)} color="#fff" />
+            <Text style={[styles.timeLeftText, { fontSize: scaleFont(8.5) }]}>{timeLeft}</Text>
           </View>
         ) : null}
 
@@ -144,6 +153,22 @@ const styles = StyleSheet.create({
   saleBadgeText: {
     fontFamily: typography.bold,
     color: '#08090b',
+  },
+  timeLeftBadge: {
+    position: 'absolute',
+    left: 8,
+    bottom: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    backgroundColor: 'rgba(8, 9, 11, 0.78)',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+  },
+  timeLeftText: {
+    fontFamily: typography.semiBold,
+    color: '#fff',
   },
   likeButton: {
     position: 'absolute',

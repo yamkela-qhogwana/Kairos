@@ -220,6 +220,84 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Kairos.Domain.Entities.Collection", b =>
+                {
+                    b.Property<byte>("CollectionId")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte>("SortOrder")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("CollectionId");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Collections");
+
+                    b.HasData(
+                        new
+                        {
+                            CollectionId = (byte)1,
+                            Icon = "star-outline",
+                            IsActive = true,
+                            Name = "Bestsellers",
+                            Slug = "bestsellers",
+                            SortOrder = (byte)1
+                        },
+                        new
+                        {
+                            CollectionId = (byte)2,
+                            Icon = "diamond-stone",
+                            IsActive = true,
+                            Name = "Luxe",
+                            Slug = "luxe",
+                            SortOrder = (byte)2
+                        },
+                        new
+                        {
+                            CollectionId = (byte)3,
+                            Icon = "tag-outline",
+                            IsActive = true,
+                            Name = "Clearance",
+                            Slug = "clearance",
+                            SortOrder = (byte)3
+                        },
+                        new
+                        {
+                            CollectionId = (byte)4,
+                            Icon = "gift-outline",
+                            IsActive = true,
+                            Name = "Seasonal",
+                            Slug = "seasonal",
+                            SortOrder = (byte)4
+                        },
+                        new
+                        {
+                            CollectionId = (byte)5,
+                            Icon = "calendar-clock-outline",
+                            IsActive = true,
+                            Name = "Rent",
+                            Slug = "rent",
+                            SortOrder = (byte)5
+                        });
+                });
+
             modelBuilder.Entity("Kairos.Domain.Entities.PasswordHistoryEntry", b =>
                 {
                     b.Property<long>("PasswordHistoryEntryId")
@@ -268,6 +346,12 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsLuxe")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRentable")
+                        .HasColumnType("bit");
+
                     b.Property<decimal>("OriginalPrice")
                         .HasColumnType("decimal(10,2)");
 
@@ -283,6 +367,9 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                     b.Property<long>("StoreId")
                         .HasColumnType("bigint");
 
+                    b.Property<byte?>("SubcategoryId")
+                        .HasColumnType("tinyint");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -295,6 +382,8 @@ namespace Kairos.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("StoreId");
 
+                    b.HasIndex("SubcategoryId");
+
                     b.ToTable("Products");
 
                     b.HasData(
@@ -303,12 +392,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 1L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "An elegant floor-length gown in black, finished with a tailored silhouette for evening occasions.",
                             DiscountPercentage = 10,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = true,
                             OriginalPrice = 129.99m,
                             Rating = 3.6400000000000001,
+                            SaleId = 1L,
                             SalePrice = 116.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)1,
                             Title = "Black Women's Gown"
                         },
                         new
@@ -316,12 +410,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 2L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A structured leather corset paired with a matching skirt for a bold, fitted look.",
                             DiscountPercentage = 16,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = true,
                             OriginalPrice = 89.99m,
                             Rating = 3.0499999999999998,
+                            SaleId = 1L,
                             SalePrice = 75.59m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)2,
                             Title = "Corset Leather With Skirt"
                         },
                         new
@@ -329,12 +428,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 3L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A classic black corset top with a coordinating skirt, cinched at the waist.",
                             DiscountPercentage = 15,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 79.99m,
                             Rating = 4.5199999999999996,
+                            SaleId = 1L,
                             SalePrice = 67.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)2,
                             Title = "Corset With Black Skirt"
                         },
                         new
@@ -342,12 +446,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 4L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A soft pea-green dress with a relaxed fit, perfect for everyday wear.",
                             DiscountPercentage = 18,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 49.99m,
                             Rating = 4.8799999999999999,
+                            SaleId = 1L,
                             SalePrice = 40.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)1,
                             Title = "Dress Pea"
                         },
                         new
@@ -355,12 +464,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 5L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A striking red and black two-piece suit with sharp tailoring.",
                             DiscountPercentage = 19,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = true,
                             OriginalPrice = 179.99m,
                             Rating = 4.4800000000000004,
+                            SaleId = 1L,
                             SalePrice = 145.79m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)2,
                             Title = "Marni Red & Black Suit"
                         },
                         new
@@ -368,12 +482,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 6L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A lightweight blue frock with a flattering A-line cut.",
                             DiscountPercentage = 12,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 29.99m,
                             Rating = 4.1699999999999999,
+                            SaleId = 1L,
                             SalePrice = 26.39m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)1,
                             Title = "Blue Frock"
                         },
                         new
@@ -381,12 +500,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 7L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A breezy summer dress in a light fabric, ideal for warm days.",
                             DiscountPercentage = 19,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 19.99m,
                             Rating = 4.7699999999999996,
+                            SaleId = 1L,
                             SalePrice = 16.19m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)1,
                             Title = "Girl Summer Dress"
                         },
                         new
@@ -394,12 +518,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 8L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A versatile grey dress that moves easily from day to evening.",
                             DiscountPercentage = 14,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 34.99m,
                             Rating = 2.7200000000000002,
+                            SaleId = 1L,
                             SalePrice = 30.09m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)1,
                             Title = "Gray Dress"
                         },
                         new
@@ -407,12 +536,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 9L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A playful short frock with a fitted bodice and flared hem.",
                             DiscountPercentage = 13,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 24.99m,
                             Rating = 3.23,
+                            SaleId = 1L,
                             SalePrice = 21.74m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)1,
                             Title = "Short Frock"
                         },
                         new
@@ -420,12 +554,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 10L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A tartan-print dress with a nipped waist and classic collar.",
                             DiscountPercentage = 13,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 39.99m,
                             Rating = 4.0499999999999998,
+                            SaleId = 1L,
                             SalePrice = 34.79m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)1,
                             Title = "Tartan Dress"
                         },
                         new
@@ -433,12 +572,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 11L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Soft slip-on slippers in a black and brown colourway.",
                             DiscountPercentage = 3,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 19.99m,
                             Rating = 2.5299999999999998,
+                            SaleId = 1L,
                             SalePrice = 19.39m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)3,
                             Title = "Black & Brown Slipper"
                         },
                         new
@@ -446,12 +590,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 12L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Pointed-toe heels from Calvin Klein with a sleek finish.",
                             DiscountPercentage = 3,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 79.99m,
                             Rating = 4.9199999999999999,
+                            SaleId = 1L,
                             SalePrice = 77.59m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)3,
                             Title = "Calvin Klein Heel Shoes"
                         },
                         new
@@ -459,12 +608,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 13L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Metallic gold heels designed to catch the light at any event.",
                             DiscountPercentage = 14,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 49.99m,
                             Rating = 3.2599999999999998,
+                            SaleId = 1L,
                             SalePrice = 42.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)3,
                             Title = "Golden Shoes Woman"
                         },
                         new
@@ -472,12 +626,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 14L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Comfortable everyday flats with a cushioned footbed.",
                             DiscountPercentage = 14,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 29.99m,
                             Rating = 3.0499999999999998,
+                            SaleId = 1L,
                             SalePrice = 25.79m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)3,
                             Title = "Pampi Shoes"
                         },
                         new
@@ -485,12 +644,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 15L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Statement red shoes with a rounded toe and block heel.",
                             DiscountPercentage = 18,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 34.99m,
                             Rating = 3.25,
+                            SaleId = 1L,
                             SalePrice = 28.69m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)3,
                             Title = "Red Shoes"
                         },
                         new
@@ -498,12 +662,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 16L,
                             CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A structured blue handbag with a top handle and adjustable strap.",
                             DiscountPercentage = 18,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 49.99m,
                             Rating = 2.9199999999999999,
+                            SaleId = 1L,
                             SalePrice = 40.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)8,
                             Title = "Blue Women's Handbag"
                         },
                         new
@@ -511,12 +680,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 17L,
                             CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A genuine leather handbag from Heshe with a timeless silhouette.",
                             DiscountPercentage = 4,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 129.99m,
                             Rating = 4.9199999999999999,
+                            SaleId = 1L,
                             SalePrice = 124.79m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)8,
                             Title = "Heshe Women's Leather Bag"
                         },
                         new
@@ -524,12 +698,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 18L,
                             CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A premium Prada handbag crafted for everyday luxury.",
                             DiscountPercentage = 14,
                             IsActive = true,
+                            IsLuxe = true,
+                            IsRentable = true,
                             OriginalPrice = 599.99m,
                             Rating = 2.71,
+                            SaleId = 1L,
                             SalePrice = 515.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)8,
                             Title = "Prada Women Bag"
                         },
                         new
@@ -537,12 +716,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 19L,
                             CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A white faux-leather backpack with padded straps for daily use.",
                             DiscountPercentage = 15,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 39.99m,
                             Rating = 3.3599999999999999,
+                            SaleId = 1L,
                             SalePrice = 33.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)9,
                             Title = "White Faux Leather Backpack"
                         },
                         new
@@ -550,12 +734,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 20L,
                             CategoryId = (byte)11,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A classic black handbag with a roomy interior and secure zip closure.",
                             DiscountPercentage = 12,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 59.99m,
                             Rating = 2.8900000000000001,
+                            SaleId = 1L,
                             SalePrice = 52.79m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)8,
                             Title = "Women Handbag Black"
                         },
                         new
@@ -563,12 +752,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 21L,
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Crystal drop earrings in a rich emerald green.",
                             DiscountPercentage = 15,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 29.99m,
                             Rating = 3.96,
+                            SaleId = 1L,
                             SalePrice = 25.49m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)10,
                             Title = "Green Crystal Earring"
                         },
                         new
@@ -576,12 +770,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 22L,
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Oval-cut green stone earrings with a delicate gold-tone setting.",
                             DiscountPercentage = 15,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 24.99m,
                             Rating = 3.5699999999999998,
+                            SaleId = 1L,
                             SalePrice = 21.24m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)10,
                             Title = "Green Oval Earring"
                         },
                         new
@@ -589,12 +788,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 23L,
                             CategoryId = (byte)9,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Statement earrings with a tropical-inspired design.",
                             DiscountPercentage = 1,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 19.99m,
                             Rating = 4.4000000000000004,
+                            SaleId = 2L,
                             SalePrice = 19.79m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)10,
                             Title = "Tropical Earring"
                         },
                         new
@@ -602,12 +806,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 24L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Classic black sunglasses with UV-protective lenses.",
                             DiscountPercentage = 5,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 29.99m,
                             Rating = 4.4100000000000001,
+                            SaleId = 2L,
                             SalePrice = 28.49m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)4,
                             Title = "Black Sun Glasses"
                         },
                         new
@@ -615,12 +824,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 25L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Timeless sunglasses with a rounded frame.",
                             DiscountPercentage = 5,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 24.99m,
                             Rating = 3.8599999999999999,
+                            SaleId = 2L,
                             SalePrice = 23.74m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)4,
                             Title = "Classic Sun Glasses"
                         },
                         new
@@ -628,12 +842,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 26L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Two-tone sunglasses in green and black with a modern frame.",
                             DiscountPercentage = 1,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 34.99m,
                             Rating = 4.5499999999999998,
+                            SaleId = 2L,
                             SalePrice = 34.64m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)4,
                             Title = "Green and Black Glasses"
                         },
                         new
@@ -641,12 +860,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 27L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Statement sunglasses with a bold frame, made for standing out.",
                             DiscountPercentage = 11,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 19.99m,
                             Rating = 2.79,
+                            SaleId = 2L,
                             SalePrice = 17.79m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)4,
                             Title = "Party Glasses"
                         },
                         new
@@ -654,12 +878,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 28L,
                             CategoryId = (byte)2,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Everyday sunglasses with a lightweight frame.",
                             DiscountPercentage = 2,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 22.99m,
                             Rating = 3.02,
+                            SaleId = 2L,
                             SalePrice = 22.53m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)4,
                             Title = "Sunglasses"
                         },
                         new
@@ -667,12 +896,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 29L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A checked shirt in blue and black, cut for a relaxed everyday fit.",
                             DiscountPercentage = 15,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 29.99m,
                             Rating = 3.6400000000000001,
+                            SaleId = 2L,
                             SalePrice = 25.49m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)5,
                             Title = "Blue & Black Check Shirt"
                         },
                         new
@@ -680,12 +914,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 30L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A graphic Aorus-branded t-shirt in soft cotton.",
                             DiscountPercentage = 1,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 24.99m,
                             Rating = 3.1800000000000002,
+                            SaleId = 2L,
                             SalePrice = 24.74m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)5,
                             Title = "Gigabyte Aorus Men Tshirt"
                         },
                         new
@@ -693,12 +932,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 31L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A classic plaid shirt with a button-down collar.",
                             DiscountPercentage = 20,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 34.99m,
                             Rating = 3.46,
+                            SaleId = 2L,
                             SalePrice = 27.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)5,
                             Title = "Man Plaid Shirt"
                         },
                         new
@@ -706,12 +950,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 32L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A lightweight short-sleeve shirt for warm-weather wear.",
                             DiscountPercentage = 7,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 19.99m,
                             Rating = 2.8999999999999999,
+                            SaleId = 2L,
                             SalePrice = 18.59m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)5,
                             Title = "Man Short Sleeve Shirt"
                         },
                         new
@@ -719,12 +968,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 33L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A checked button-up shirt with a tailored fit.",
                             DiscountPercentage = 11,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 27.99m,
                             Rating = 2.7200000000000002,
+                            SaleId = 2L,
                             SalePrice = 24.91m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)5,
                             Title = "Men Check Shirt"
                         },
                         new
@@ -732,12 +986,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 34L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Iconic Air Jordan 1 sneakers in a red and black colourway.",
                             DiscountPercentage = 4,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 149.99m,
                             Rating = 4.7699999999999996,
+                            SaleId = 2L,
                             SalePrice = 143.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)6,
                             Title = "Nike Air Jordan 1 Red And Black"
                         },
                         new
@@ -745,12 +1004,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 35L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Performance baseball cleats built for grip and speed.",
                             DiscountPercentage = 18,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 79.99m,
                             Rating = 3.8799999999999999,
+                            SaleId = 2L,
                             SalePrice = 65.59m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)6,
                             Title = "Nike Baseball Cleats"
                         },
                         new
@@ -758,12 +1022,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 36L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Retro-styled Puma trainers with a cushioned sole.",
                             DiscountPercentage = 4,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 89.99m,
                             Rating = 4.9000000000000004,
+                            SaleId = 2L,
                             SalePrice = 86.39m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)6,
                             Title = "Puma Future Rider Trainers"
                         },
                         new
@@ -771,12 +1040,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 37L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "Lightweight sneakers in off-white and red, built for everyday training.",
                             DiscountPercentage = 5,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 119.99m,
                             Rating = 4.7699999999999996,
+                            SaleId = 2L,
                             SalePrice = 113.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)6,
                             Title = "Sports Sneakers Off White & Red"
                         },
                         new
@@ -784,10 +1058,14 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 38L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A low-top sneaker in off-white with red accents.",
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 109.99m,
                             Rating = 4.6900000000000004,
                             StoreId = 1L,
+                            SubcategoryId = (byte)6,
                             Title = "Sports Sneakers Off White Red"
                         },
                         new
@@ -795,12 +1073,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 39L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A classic watch with a brown leather strap and minimalist dial.",
                             DiscountPercentage = 6,
                             IsActive = true,
+                            IsLuxe = false,
+                            IsRentable = false,
                             OriginalPrice = 89.99m,
                             Rating = 4.1900000000000004,
+                            SaleId = 2L,
                             SalePrice = 84.59m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)7,
                             Title = "Brown Leather Belt Watch"
                         },
                         new
@@ -808,12 +1091,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 40L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A Longines Master Collection watch with a refined, understated face.",
                             DiscountPercentage = 17,
                             IsActive = true,
+                            IsLuxe = true,
+                            IsRentable = true,
                             OriginalPrice = 1499.99m,
                             Rating = 3.8700000000000001,
+                            SaleId = 2L,
                             SalePrice = 1244.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)7,
                             Title = "Longines Master Collection"
                         },
                         new
@@ -821,12 +1109,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 41L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A Rolex Cellini with a black dial and date function.",
                             DiscountPercentage = 9,
                             IsActive = true,
+                            IsLuxe = true,
+                            IsRentable = false,
                             OriginalPrice = 8999.99m,
                             Rating = 4.9699999999999998,
+                            SaleId = 2L,
                             SalePrice = 8189.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)7,
                             Title = "Rolex Cellini Date Black Dial"
                         },
                         new
@@ -834,12 +1127,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 42L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A Rolex Cellini Moonphase with an intricate dial complication.",
                             DiscountPercentage = 18,
                             IsActive = true,
+                            IsLuxe = true,
+                            IsRentable = false,
                             OriginalPrice = 12999.99m,
                             Rating = 2.5800000000000001,
+                            SaleId = 2L,
                             SalePrice = 10659.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)7,
                             Title = "Rolex Cellini Moonphase"
                         },
                         new
@@ -847,12 +1145,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 43L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A Rolex Datejust, the brand's most recognisable classic.",
                             DiscountPercentage = 4,
                             IsActive = true,
+                            IsLuxe = true,
+                            IsRentable = false,
                             OriginalPrice = 10999.99m,
                             Rating = 3.6600000000000001,
+                            SaleId = 2L,
                             SalePrice = 10559.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)7,
                             Title = "Rolex Datejust"
                         },
                         new
@@ -860,12 +1163,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             ProductId = 44L,
                             CategoryId = (byte)1,
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Description = "A Rolex Submariner built for durability and timeless style.",
                             DiscountPercentage = 5,
                             IsActive = true,
+                            IsLuxe = true,
+                            IsRentable = false,
                             OriginalPrice = 13999.99m,
                             Rating = 2.6899999999999999,
+                            SaleId = 2L,
                             SalePrice = 13299.99m,
                             StoreId = 1L,
+                            SubcategoryId = (byte)7,
                             Title = "Rolex Submariner Watch"
                         });
                 });
@@ -1240,6 +1548,1309 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Kairos.Domain.Entities.ProductSize", b =>
+                {
+                    b.Property<long>("ProductSizeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("ProductSizeId"));
+
+                    b.Property<long>("ProductId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("UnitsSold")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductSizeId");
+
+                    b.HasIndex("ProductId", "Size")
+                        .IsUnique();
+
+                    b.ToTable("ProductSizes");
+
+                    b.HasData(
+                        new
+                        {
+                            ProductSizeId = 1L,
+                            ProductId = 1L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 2L,
+                            ProductId = 1L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 3L,
+                            ProductId = 1L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 4L,
+                            ProductId = 1L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 5L,
+                            ProductId = 1L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 6L,
+                            ProductId = 2L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 7L,
+                            ProductId = 2L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 8L,
+                            ProductId = 2L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 9L,
+                            ProductId = 2L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 10L,
+                            ProductId = 2L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 11L,
+                            ProductId = 3L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 12L,
+                            ProductId = 3L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 13L,
+                            ProductId = 3L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 14L,
+                            ProductId = 3L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 15L,
+                            ProductId = 3L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 16L,
+                            ProductId = 4L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 17L,
+                            ProductId = 4L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 18L,
+                            ProductId = 4L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 19L,
+                            ProductId = 4L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 20L,
+                            ProductId = 4L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 21L,
+                            ProductId = 5L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 22L,
+                            ProductId = 5L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 23L,
+                            ProductId = 5L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 24L,
+                            ProductId = 5L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 25L,
+                            ProductId = 5L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 26L,
+                            ProductId = 6L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 27L,
+                            ProductId = 6L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 28L,
+                            ProductId = 6L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 29L,
+                            ProductId = 6L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 30L,
+                            ProductId = 6L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 31L,
+                            ProductId = 7L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 32L,
+                            ProductId = 7L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 33L,
+                            ProductId = 7L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 34L,
+                            ProductId = 7L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 35L,
+                            ProductId = 7L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 36L,
+                            ProductId = 8L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 37L,
+                            ProductId = 8L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 38L,
+                            ProductId = 8L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 39L,
+                            ProductId = 8L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 40L,
+                            ProductId = 8L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 41L,
+                            ProductId = 9L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 42L,
+                            ProductId = 9L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 43L,
+                            ProductId = 9L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 44L,
+                            ProductId = 9L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 45L,
+                            ProductId = 9L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 46L,
+                            ProductId = 10L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 47L,
+                            ProductId = 10L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 48L,
+                            ProductId = 10L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 49L,
+                            ProductId = 10L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 50L,
+                            ProductId = 10L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 51L,
+                            ProductId = 11L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 52L,
+                            ProductId = 11L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 53L,
+                            ProductId = 11L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 54L,
+                            ProductId = 11L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 55L,
+                            ProductId = 11L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 56L,
+                            ProductId = 11L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 57L,
+                            ProductId = 12L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 58L,
+                            ProductId = 12L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 59L,
+                            ProductId = 12L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 60L,
+                            ProductId = 12L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 61L,
+                            ProductId = 12L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 62L,
+                            ProductId = 12L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 63L,
+                            ProductId = 13L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 64L,
+                            ProductId = 13L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 65L,
+                            ProductId = 13L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 66L,
+                            ProductId = 13L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 67L,
+                            ProductId = 13L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 68L,
+                            ProductId = 13L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 69L,
+                            ProductId = 14L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 70L,
+                            ProductId = 14L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 71L,
+                            ProductId = 14L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 72L,
+                            ProductId = 14L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 73L,
+                            ProductId = 14L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 74L,
+                            ProductId = 14L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 75L,
+                            ProductId = 15L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 76L,
+                            ProductId = 15L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 77L,
+                            ProductId = 15L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 78L,
+                            ProductId = 15L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 79L,
+                            ProductId = 15L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 80L,
+                            ProductId = 15L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 81L,
+                            ProductId = 16L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 82L,
+                            ProductId = 17L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 83L,
+                            ProductId = 18L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 84L,
+                            ProductId = 19L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 85L,
+                            ProductId = 20L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 86L,
+                            ProductId = 21L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 87L,
+                            ProductId = 22L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 88L,
+                            ProductId = 23L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 89L,
+                            ProductId = 24L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 90L,
+                            ProductId = 25L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 91L,
+                            ProductId = 26L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 92L,
+                            ProductId = 27L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 93L,
+                            ProductId = 28L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 94L,
+                            ProductId = 29L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 95L,
+                            ProductId = 29L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 96L,
+                            ProductId = 29L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 97L,
+                            ProductId = 29L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 98L,
+                            ProductId = 29L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 99L,
+                            ProductId = 30L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 100L,
+                            ProductId = 30L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 101L,
+                            ProductId = 30L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 102L,
+                            ProductId = 30L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 103L,
+                            ProductId = 30L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 104L,
+                            ProductId = 31L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 105L,
+                            ProductId = 31L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 106L,
+                            ProductId = 31L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 107L,
+                            ProductId = 31L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 108L,
+                            ProductId = 31L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 109L,
+                            ProductId = 32L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 110L,
+                            ProductId = 32L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 111L,
+                            ProductId = 32L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 112L,
+                            ProductId = 32L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 113L,
+                            ProductId = 32L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 114L,
+                            ProductId = 33L,
+                            Quantity = 20,
+                            Size = "XS",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 115L,
+                            ProductId = 33L,
+                            Quantity = 20,
+                            Size = "S",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 116L,
+                            ProductId = 33L,
+                            Quantity = 20,
+                            Size = "M",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 117L,
+                            ProductId = 33L,
+                            Quantity = 20,
+                            Size = "L",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 118L,
+                            ProductId = 33L,
+                            Quantity = 20,
+                            Size = "XL",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 119L,
+                            ProductId = 34L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 120L,
+                            ProductId = 34L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 121L,
+                            ProductId = 34L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 122L,
+                            ProductId = 34L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 123L,
+                            ProductId = 34L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 124L,
+                            ProductId = 34L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 125L,
+                            ProductId = 34L,
+                            Quantity = 20,
+                            Size = "12",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 126L,
+                            ProductId = 35L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 127L,
+                            ProductId = 35L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 128L,
+                            ProductId = 35L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 129L,
+                            ProductId = 35L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 130L,
+                            ProductId = 35L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 131L,
+                            ProductId = 35L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 132L,
+                            ProductId = 35L,
+                            Quantity = 20,
+                            Size = "12",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 133L,
+                            ProductId = 36L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 134L,
+                            ProductId = 36L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 135L,
+                            ProductId = 36L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 136L,
+                            ProductId = 36L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 137L,
+                            ProductId = 36L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 138L,
+                            ProductId = 36L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 139L,
+                            ProductId = 36L,
+                            Quantity = 20,
+                            Size = "12",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 140L,
+                            ProductId = 37L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 141L,
+                            ProductId = 37L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 142L,
+                            ProductId = 37L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 143L,
+                            ProductId = 37L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 144L,
+                            ProductId = 37L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 145L,
+                            ProductId = 37L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 146L,
+                            ProductId = 37L,
+                            Quantity = 20,
+                            Size = "12",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 147L,
+                            ProductId = 38L,
+                            Quantity = 20,
+                            Size = "6",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 148L,
+                            ProductId = 38L,
+                            Quantity = 20,
+                            Size = "7",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 149L,
+                            ProductId = 38L,
+                            Quantity = 20,
+                            Size = "8",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 150L,
+                            ProductId = 38L,
+                            Quantity = 20,
+                            Size = "9",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 151L,
+                            ProductId = 38L,
+                            Quantity = 20,
+                            Size = "10",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 152L,
+                            ProductId = 38L,
+                            Quantity = 20,
+                            Size = "11",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 153L,
+                            ProductId = 38L,
+                            Quantity = 20,
+                            Size = "12",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 154L,
+                            ProductId = 39L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 155L,
+                            ProductId = 40L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 156L,
+                            ProductId = 41L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 157L,
+                            ProductId = 42L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 158L,
+                            ProductId = 43L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        },
+                        new
+                        {
+                            ProductSizeId = 159L,
+                            ProductId = 44L,
+                            Quantity = 20,
+                            Size = "One Size",
+                            UnitsSold = 0
+                        });
+                });
+
             modelBuilder.Entity("Kairos.Domain.Entities.Sale", b =>
                 {
                     b.Property<long>("SaleId")
@@ -1269,6 +2880,26 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                     b.HasIndex("StoreId");
 
                     b.ToTable("Sales");
+
+                    b.HasData(
+                        new
+                        {
+                            SaleId = 1L,
+                            EndDate = new DateTime(2026, 10, 17, 20, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            Name = "Flash Sale",
+                            StartDate = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StoreId = 1L
+                        },
+                        new
+                        {
+                            SaleId = 2L,
+                            EndDate = new DateTime(2026, 10, 20, 20, 0, 0, 0, DateTimeKind.Utc),
+                            IsActive = true,
+                            Name = "Weekend Deals",
+                            StartDate = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
+                            StoreId = 1L
+                        });
                 });
 
             modelBuilder.Entity("Kairos.Domain.Entities.Store", b =>
@@ -1313,6 +2944,130 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                             CreatedAt = new DateTime(2026, 9, 21, 0, 0, 0, 0, DateTimeKind.Utc),
                             IsActive = true,
                             Name = "Kairos Demo Store"
+                        });
+                });
+
+            modelBuilder.Entity("Kairos.Domain.Entities.Subcategory", b =>
+                {
+                    b.Property<byte>("SubcategoryId")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("CategoryId")
+                        .HasColumnType("tinyint");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<byte>("SortOrder")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("SubcategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Subcategories");
+
+                    b.HasData(
+                        new
+                        {
+                            SubcategoryId = (byte)1,
+                            CategoryId = (byte)2,
+                            IsActive = true,
+                            Name = "Dresses",
+                            Slug = "dresses",
+                            SortOrder = (byte)1
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)2,
+                            CategoryId = (byte)2,
+                            IsActive = true,
+                            Name = "Suits & Corsets",
+                            Slug = "suits-corsets",
+                            SortOrder = (byte)2
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)3,
+                            CategoryId = (byte)2,
+                            IsActive = true,
+                            Name = "Shoes",
+                            Slug = "shoes",
+                            SortOrder = (byte)3
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)4,
+                            CategoryId = (byte)2,
+                            IsActive = true,
+                            Name = "Eyewear",
+                            Slug = "eyewear",
+                            SortOrder = (byte)4
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)5,
+                            CategoryId = (byte)1,
+                            IsActive = true,
+                            Name = "Shirts & Tees",
+                            Slug = "shirts-tees",
+                            SortOrder = (byte)1
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)6,
+                            CategoryId = (byte)1,
+                            IsActive = true,
+                            Name = "Footwear",
+                            Slug = "footwear",
+                            SortOrder = (byte)2
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)7,
+                            CategoryId = (byte)1,
+                            IsActive = true,
+                            Name = "Watches",
+                            Slug = "watches",
+                            SortOrder = (byte)3
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)8,
+                            CategoryId = (byte)11,
+                            IsActive = true,
+                            Name = "Handbags",
+                            Slug = "handbags",
+                            SortOrder = (byte)1
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)9,
+                            CategoryId = (byte)11,
+                            IsActive = true,
+                            Name = "Backpacks",
+                            Slug = "backpacks",
+                            SortOrder = (byte)2
+                        },
+                        new
+                        {
+                            SubcategoryId = (byte)10,
+                            CategoryId = (byte)9,
+                            IsActive = true,
+                            Name = "Earrings",
+                            Slug = "earrings",
+                            SortOrder = (byte)1
                         });
                 });
 
@@ -1410,17 +3165,35 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Kairos.Domain.Entities.Subcategory", "Subcategory")
+                        .WithMany("Products")
+                        .HasForeignKey("SubcategoryId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Category");
 
                     b.Navigation("Sale");
 
                     b.Navigation("Store");
+
+                    b.Navigation("Subcategory");
                 });
 
             modelBuilder.Entity("Kairos.Domain.Entities.ProductImage", b =>
                 {
                     b.HasOne("Kairos.Domain.Entities.Product", "Product")
                         .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("Kairos.Domain.Entities.ProductSize", b =>
+                {
+                    b.HasOne("Kairos.Domain.Entities.Product", "Product")
+                        .WithMany("Sizes")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1449,6 +3222,17 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                     b.Navigation("OwnerUser");
                 });
 
+            modelBuilder.Entity("Kairos.Domain.Entities.Subcategory", b =>
+                {
+                    b.HasOne("Kairos.Domain.Entities.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Kairos.Domain.Entities.AddressType", b =>
                 {
                     b.Navigation("Addresses");
@@ -1462,6 +3246,8 @@ namespace Kairos.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("Kairos.Domain.Entities.Product", b =>
                 {
                     b.Navigation("Images");
+
+                    b.Navigation("Sizes");
                 });
 
             modelBuilder.Entity("Kairos.Domain.Entities.Sale", b =>
@@ -1474,6 +3260,11 @@ namespace Kairos.Infrastructure.Persistence.Migrations
                     b.Navigation("Products");
 
                     b.Navigation("Sales");
+                });
+
+            modelBuilder.Entity("Kairos.Domain.Entities.Subcategory", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Kairos.Domain.Entities.User", b =>

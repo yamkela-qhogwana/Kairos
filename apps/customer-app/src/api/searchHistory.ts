@@ -26,3 +26,15 @@ export async function addRecentSearch(term: string): Promise<string[]> {
   await SecureStore.setItemAsync(RECENT_SEARCHES_KEY, JSON.stringify(next));
   return next;
 }
+
+export async function removeRecentSearch(term: string): Promise<string[]> {
+  const existing = await getRecentSearches();
+  const next = existing.filter((t) => t.toLowerCase() !== term.toLowerCase());
+  await SecureStore.setItemAsync(RECENT_SEARCHES_KEY, JSON.stringify(next));
+  return next;
+}
+
+export async function clearRecentSearches(): Promise<string[]> {
+  await SecureStore.deleteItemAsync(RECENT_SEARCHES_KEY);
+  return [];
+}
